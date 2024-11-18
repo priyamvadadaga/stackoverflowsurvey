@@ -6,11 +6,11 @@ execute:
   echo: true
 
 book:
-  title: "YOUR PROJECT TITLE"
+  title: "StackOverflow 2024 Survey Analysis"
   author:
-    - AUTHOR1 (UNI1)
-    - AUTHOR2 (UNI2)
-  repo-url: https://github.com/YOUR_GITHUB_ACCOUNT/REPO_NAME
+    - Priyamvada Daga (psd2127)
+    - Shachi Hardi (sh4615)
+  repo-url: https://github.com/priyamvadadaga/stackoverflowsurvey
   date: today
   page-footer:
     right: |
