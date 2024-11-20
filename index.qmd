@@ -2,3 +2,9 @@
 In May 2024 over 65,000 developers responded Stack Overflow's annual survey about 
 coding, working, AI and how they feel about the industry. This data can provide valuable insights into the current state of the tech industry. As all of us work in tech or aim to work in tech, understanding these trends is essential to stay informed. These insights are crucial for understanding how the industry is evolving and how developers feel about the tools, skills, and environments shaping their work. 
 
+Before OpenAI and other LLMs were built, StackOverflow was the go to source for
+developers to have their questions answered.
+
+Questions we want to answer:
+1. Demographic study of respondents including education, work and culture.
+2. To understand developers' perspective on AI in the workplace.
