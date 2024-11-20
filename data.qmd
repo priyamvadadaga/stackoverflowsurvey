@@ -6,7 +6,6 @@
 
 ```{r}
 survey <- read.csv('data/survey_results_public.csv')
-survey
 ```
 
 ```{r}
@@ -19,12 +18,9 @@ library(dplyr)
 
 
 selected <- survey |> select(all_of(keep))
-selected
 ```
 
 ```{r}
-summary(selected)
-
 colSums(is.na(selected))
 colMeans(is.na(selected)) * 100
 
