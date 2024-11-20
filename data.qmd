@@ -3,3 +3,54 @@
 ## Description
 
 ## Missing value analysis
+
+```{r}
+survey <- read.csv('data/survey_results_public.csv')
+survey
+```
+
+```{r}
+keep <- c('MainBranch', 'Age', 'RemoteWork', 'Check', 'EdLevel', 'YearsCode', 'YearsCodePro', 'DevType', 'Country', 'SOVisitFreq', 'SOAccount', 'SOPartFreq', 'SOComm', 'AISelect', 'AISent', 'AIAcc', 'AIComplex', 'AIThreat', 'ICorPM', 'WorkExp', 'Knowledge_1', 'Knowledge_2', 'Knowledge_3', 'Knowledge_4', 'Knowledge_5', 'Knowledge_6', 'Knowledge_7', 'Knowledge_8', 'Knowledge_9', 'TimeSearching', 'TimeAnswering', 'ProfessionalCloud', 'ProfessionalQuestion', 'Industry', 'SurveyLength', 'SurveyEase', 'ConvertedCompYearly', 'JobSat')
+```
+
+```{r}
+library(tidyverse)
+library(dplyr)
+
+
+selected <- survey |> select(all_of(keep))
+selected
+```
+
+```{r}
+summary(selected)
+
+colSums(is.na(selected))
+colMeans(is.na(selected)) * 100
+
+selected <- selected |>
+  mutate(across(c('MainBranch', 'Age', 'RemoteWork', 'Check', 'EdLevel', 'DevType', 'SOVisitFreq', 'SOAccount', 'SOPartFreq', 'SOComm', 'AISelect', 'AISent', 'AIAcc', 'AIComplex', 'AIThreat', 'ICorPM', 'Knowledge_1', 'Knowledge_2', 'Knowledge_3', 'Knowledge_4', 'Knowledge_5', 'Knowledge_6', 'Knowledge_7', 'Knowledge_8', 'Knowledge_9', 'TimeSearching', 'TimeAnswering', 'ProfessionalCloud', 'ProfessionalQuestion', 'SurveyLength', 'SurveyEase', 'JobSat'), as.factor))
+
+summary(selected)
+```
+
+```{r}
+library(reshape2)
+
+missing_matrix <- is.na(selected) * 1
+missing_corr <- cor(missing_matrix)
+missing_corr_melted <- melt(missing_corr)
+
+
+ggplot(missing_corr_melted, aes(Var1, Var2, fill = value)) +
+  geom_tile(color = "white") +
+  scale_fill_gradient2(
+    low = "blue", high = "red", mid = "white", midpoint = 0,
+    limit = c(-1, 1), space = "Lab", name = "Correlation"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1)
+  ) +
+  labs(title = "Correlation of Missing Values", x = "Columns", y = "Columns")
+```
