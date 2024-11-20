@@ -54,3 +54,23 @@ ggplot(missing_corr_melted, aes(Var1, Var2, fill = value)) +
   ) +
   labs(title = "Correlation of Missing Values", x = "Columns", y = "Columns")
 ```
+
+```{r}
+selected$SurveyLength <- fct_explicit_na(selected$SurveyLength, na_level = "Missing")
+
+missing_values <- selected %>%
+  group_by(SurveyLength) %>%
+  summarise(across(everything(), ~ mean(is.na(.)))) %>%
+  pivot_longer(cols = -SurveyLength, names_to = "question", values_to = "missing_proportion")
+
+missing_values$question <- factor(missing_values$question, levels = unique(missing_values$question))
+
+ggplot(missing_values, aes(x = question, y = missing_proportion)) +
+  geom_line(group = 1, color = "blue", size = 1) +
+  geom_point(color = "red", size = 2) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  labs(x = "Survey Question", y = "Proportion of Missing Values", title = "Missing Data Across Survey Questions by SurveyLength") +
+  facet_wrap(~ SurveyLength, scales = "free_y") # Facet by SurveyLength
+```
+
+
