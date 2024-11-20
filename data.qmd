@@ -41,7 +41,6 @@ missing_matrix <- is.na(selected) * 1
 missing_corr <- cor(missing_matrix)
 missing_corr_melted <- melt(missing_corr)
 
-
 ggplot(missing_corr_melted, aes(Var1, Var2, fill = value)) +
   geom_tile(color = "white") +
   scale_fill_gradient2(
@@ -73,4 +72,24 @@ ggplot(missing_values, aes(x = question, y = missing_proportion)) +
   facet_wrap(~ SurveyLength, scales = "free_y") # Facet by SurveyLength
 ```
 
+```{r}
+library(ggplot2)
+missing_counts <- colSums(is.na(selected))
+missing_percent <- (missing_counts / nrow(selected)) * 100
+missing_df <- data.frame(
+  column = names(missing_counts),
+  missing_percent = missing_percent
+)
+
+# Plot missing values
+ggplot(missing_df, aes(x = column, y = missing_percent)) +
+  geom_bar(stat = "identity", fill = "steelblue") +
+  labs(
+    title = "Percentage of Missing Values per Column",
+    x = "Columns",
+    y = "Missing Values (%)"
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
 
