@@ -1,11 +1,29 @@
 # Data
 
 ## Description
+This is the link from which the data set has been obtained:
+https://survey.stackoverflow.co/
+The data has been collected by Stack Overflow themselves and is updated on a 
+yearly basis.
+The dataset consists of a questionnaire with over 65,000 respondents and consists
+of 114 columns (features) and 65,437 rows.
+One issue encountered with the dataset is that multiple questions were allowed
+to have multiple answers. Hence answer responses are not clearly defined.
+To combat this issue we have decided to focus our analysis on columns with 
+single response values only at the moment. Thus we have created a subset of our
+data and are choosing to focus on that.
+
+The data was imported using the read.csv function.
+
+
 
 ## Missing value analysis
 
 ```{r}
 survey <- read.csv('data/survey_results_public.csv')
+
+ncol(survey)
+nrow(survey)
 ```
 
 ```{r}
