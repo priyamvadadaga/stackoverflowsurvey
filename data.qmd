@@ -12,7 +12,6 @@ One concern in terms of parsing is with regards to multi-select questions. Parsi
 
 Finally, the data is downloaded into the `data' folder and is imported using read.csv in R.
 
-
 ## Missing value analysis
 
 ```{r}
