@@ -1,20 +1,16 @@
 # Data
 
 ## Description
-This is the link from which the data set has been obtained:
-https://survey.stackoverflow.co/
-The data has been collected by Stack Overflow themselves and is updated on a 
-yearly basis.
-The dataset consists of a questionnaire with over 65,000 respondents and consists
-of 114 columns (features) and 65,437 rows.
-One issue encountered with the dataset is that multiple questions were allowed
-to have multiple answers. Hence answer responses are not clearly defined.
-To combat this issue we have decided to focus our analysis on columns with 
-single response values only at the moment. Thus we have created a subset of our
-data and are choosing to focus on that.
 
-The data was imported using the read.csv function.
+This is the link from which the data set has been obtained: https://survey.stackoverflow.co/
 
+Every May since 2011, Stack Overflow conducts an annual survey. The 2024 survey included data about coding, working, AI and Stack Overflow users' profiles and perceptions in these domains. The data is collected by Stack Overflow via a Qualtrics survey, and is updated on a yearly basis. The survey follows a questionnaire style with different types of questions including single-choice, multi-select, and Likert scale questions, ranking scale, boolean and text-based.
+
+The May 2024 survey had over 65,000 respondents. Stack Overflow publishes results as a data table with 114 features (engineered from 87 questions) and 65,437 rows. 
+
+One concern in terms of parsing is with regards to multi-select questions. Parsing these either result in adding multiple columns which will have many missing values or parsing them in all possible combinations which has little interpretability. Hence, to begin, we limit the inputs to our analysis to the other question types. Additionally, we went through the schema and have picked questions whose responses are relevant to our research questions.
+
+Finally, the data is downloaded into the `data' folder and is imported using read.csv in R.
 
 
 ## Missing value analysis
