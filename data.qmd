@@ -2,46 +2,65 @@
 
 ## Description
 
-This is the link from which the data set has been obtained: https://survey.stackoverflow.co/
+This is the link from which the data set has been obtained: [Stack Overflow Survey 2024](https://survey.stackoverflow.co/) 
 
 Every May since 2011, Stack Overflow conducts an annual survey. The 2024 survey included data about coding, working, AI and Stack Overflow users' profiles and perceptions in these domains. The data is collected by Stack Overflow via a Qualtrics survey, and is updated on a yearly basis. The survey follows a questionnaire style with different types of questions including single-choice, multi-select, and Likert scale questions, ranking scale, boolean and text-based.
 
-The May 2024 survey had over 65,000 respondents. Stack Overflow publishes results as a data table with 114 features (engineered from 87 questions) and 65,437 rows. 
+The May 2024 survey had over 65,000 respondents. Stack Overflow publishes results as a data table with 114 features (engineered from 87 questions) and 65,437 rows. It additionally publishes a schema and the questionnaire itself.
 
 One concern in terms of parsing is with regards to multi-select questions. Parsing these either result in adding multiple columns which will have many missing values or parsing them in all possible combinations which has little interpretability. Hence, to begin, we limit the inputs to our analysis to the other question types. Additionally, we went through the schema and have picked questions whose responses are relevant to our research questions.
 
-Finally, the data is downloaded into the `data' folder and is imported using read.csv in R.
+Finally, the data is downloaded into the 'data' folder and is imported using read.csv in R.
 
 ## Missing value analysis
-
-```{r}
-survey <- read.csv('data/survey_results_public.csv')
-
-ncol(survey)
-nrow(survey)
-```
-
-```{r}
-keep <- c('MainBranch', 'Age', 'RemoteWork', 'Check', 'EdLevel', 'YearsCode', 'YearsCodePro', 'DevType', 'Country', 'SOVisitFreq', 'SOAccount', 'SOPartFreq', 'SOComm', 'AISelect', 'AISent', 'AIAcc', 'AIComplex', 'AIThreat', 'ICorPM', 'WorkExp', 'Knowledge_1', 'Knowledge_2', 'Knowledge_3', 'Knowledge_4', 'Knowledge_5', 'Knowledge_6', 'Knowledge_7', 'Knowledge_8', 'Knowledge_9', 'TimeSearching', 'TimeAnswering', 'ProfessionalCloud', 'ProfessionalQuestion', 'Industry', 'SurveyLength', 'SurveyEase', 'ConvertedCompYearly', 'JobSat')
-```
 
 ```{r}
 library(tidyverse)
 library(dplyr)
 
+survey <- read.csv('data/survey_results_public.csv')
+schema <- read.csv('data/survey_results_schema.csv')
+
+# ncol(survey)
+# nrow(survey)
+
+keep <- c('MainBranch', 'Age', 'RemoteWork', 'Check', 'EdLevel', 'YearsCode', 'YearsCodePro', 'DevType', 'Country', 'ConvertedCompYearly', 'SOVisitFreq', 'SOAccount', 'SOPartFreq', 'SOComm', 'AISelect', 'AISent', 'AIAcc', 'AIComplex', 'AIThreat', 'ICorPM', 'WorkExp', 'Knowledge_1', 'Knowledge_2', 'Knowledge_3', 'Knowledge_4', 'Knowledge_5', 'Knowledge_6', 'Knowledge_7', 'Knowledge_8', 'Knowledge_9', 'TimeSearching', 'TimeAnswering', 'ProfessionalCloud', 'ProfessionalQuestion', 'Industry', 'JobSat', 'SurveyLength', 'SurveyEase')
+
 
 selected <- survey |> select(all_of(keep))
+
+# colSums(is.na(selected))
+# colMeans(is.na(selected)) * 100
+
+selected <- selected |>
+  mutate(across(c('MainBranch', 'Age', 'RemoteWork', 'Check', 'EdLevel', 'DevType', 'SOVisitFreq', 'SOAccount', 'SOPartFreq', 'SOComm', 'AISelect', 'AISent', 'AIAcc', 'AIComplex', 'AIThreat', 'ICorPM', 'Knowledge_1', 'Knowledge_2', 'Knowledge_3', 'Knowledge_4', 'Knowledge_5', 'Knowledge_6', 'Knowledge_7', 'Knowledge_8', 'Knowledge_9', 'TimeSearching', 'TimeAnswering', 'ProfessionalCloud', 'ProfessionalQuestion', 'JobSat', 'SurveyLength', 'SurveyEase'), as.factor))
+
 ```
 
 ```{r}
-colSums(is.na(selected))
-colMeans(is.na(selected)) * 100
+library(ggplot2)
+missing_counts <- colSums(is.na(selected))
+missing_percent <- (missing_counts / nrow(selected)) * 100
+missing_df <- data.frame(
+  column = names(missing_counts),
+  missing_percent = missing_percent
+)
+missing_df$column <- factor(missing_df$column, levels = missing_df$column)
 
-selected <- selected |>
-  mutate(across(c('MainBranch', 'Age', 'RemoteWork', 'Check', 'EdLevel', 'DevType', 'SOVisitFreq', 'SOAccount', 'SOPartFreq', 'SOComm', 'AISelect', 'AISent', 'AIAcc', 'AIComplex', 'AIThreat', 'ICorPM', 'Knowledge_1', 'Knowledge_2', 'Knowledge_3', 'Knowledge_4', 'Knowledge_5', 'Knowledge_6', 'Knowledge_7', 'Knowledge_8', 'Knowledge_9', 'TimeSearching', 'TimeAnswering', 'ProfessionalCloud', 'ProfessionalQuestion', 'SurveyLength', 'SurveyEase', 'JobSat'), as.factor))
-
-summary(selected)
+ggplot(missing_df, aes(x = column, y = missing_percent)) +
+  geom_bar(stat = "identity", fill='skyblue') +
+  labs(
+    title = "Percentage of Missing Values per Column",
+    x = "Columns",
+    y = "Missing Values (%)"
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, size=8)) +
+  scale_y_continuous(limits = c(0, 100))
 ```
+We first look at the percentage of missing values in each of our selected columns. As is expected from an online questionnaire, there is a very high number of missing values with multiple columns crossing the 50% threshold as well. We observe that the 'Check' column, which was just a check to ensure that the participant was paying attention to the survey has zero missing values. Thus, we do not eliminate any rows based on this check. We also notice that the series of 'Knowledge_' questions, which all serve as part of a Likert-scale question have high missing values. These are probably a result of people skipping the question entirely. 
+
+To further check if there are any correlations between not answering certain types of questions, we plot a heatmap of correlations between missing values. We cannot compute correlations for Age, Check, and MainBranch since these questions have have no missing values.
 
 ```{r}
 library(reshape2)
@@ -58,47 +77,36 @@ ggplot(missing_corr_melted, aes(Var1, Var2, fill = value)) +
   ) +
   theme_minimal() +
   theme(
-    axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1)
+    axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1, size=6),
+    axis.text.y = element_text(size=6)
   ) +
   labs(title = "Correlation of Missing Values", x = "Columns", y = "Columns")
 ```
+We observe that, typically, blocks of questions have missing values. For instance, it seems that missing values are correlated in the professional-related questions, i.e. from the column ICorPM until the industry question. These are perhaps a result of the individual being a student or just a hobby-developer. Similarly, another block of correlation is observed for the AI-related questions. Thus, it seems that perhaps, when skipping, individuals skipped certain lines of questioning entirely. 
+
+We believe that we can retain value by keeping these rows with missing values since perhaps the missing values form clusters of individuals. We explore one other cause of missing values - fatigue. To check this, we plot the percent missing values over the questions in order that they were answered, faceted on their answer to one of the last questions -- "How do you feel about the length of the survey this year?"
 
 ```{r}
-selected$SurveyLength <- fct_explicit_na(selected$SurveyLength, na_level = "Missing")
+selected$SurveyLength <- fct_na_value_to_level(selected$SurveyLength)
 
 missing_values <- selected %>%
   group_by(SurveyLength) %>%
   summarise(across(everything(), ~ mean(is.na(.)))) %>%
   pivot_longer(cols = -SurveyLength, names_to = "question", values_to = "missing_proportion")
 
-missing_values$question <- factor(missing_values$question, levels = unique(missing_values$question))
+missing_values <- missing_values %>%
+  left_join(schema, by = c("question" = "qname"))
 
 ggplot(missing_values, aes(x = question, y = missing_proportion)) +
-  geom_line(group = 1, color = "blue", size = 1) +
-  geom_point(color = "red", size = 2) +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
-  labs(x = "Survey Question", y = "Proportion of Missing Values", title = "Missing Data Across Survey Questions by SurveyLength") +
-  facet_wrap(~ SurveyLength, scales = "free_y") # Facet by SurveyLength
+  geom_line(group = 1, color = "darkgrey", size = 0.5) +
+  geom_point(aes(color = force_resp), size = 1.5) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = -0.01, size = 6)) +
+  labs(x = "Survey Question", y = "Proportion of Missing Values",
+       title = "Missing Data Across Survey Questions by SurveyLength",
+       color = "Required Question") +
+  facet_wrap(~ SurveyLength)
 ```
 
-```{r}
-library(ggplot2)
-missing_counts <- colSums(is.na(selected))
-missing_percent <- (missing_counts / nrow(selected)) * 100
-missing_df <- data.frame(
-  column = names(missing_counts),
-  missing_percent = missing_percent
-)
+We notice, as a general pattern, that the missing values have a somewhat upward trend as users progressed in the survey. As expected, the highest likelihood of missing values is when the last question is unanswered. Interestingly, those that thought the survey was "Too Short" had a higher proportion of missing values compared to those that thought it was "Too long". Although somewhat counter intuitive, perhaps it is the fatigue from actually answering the questions that results in answering "Too long", while not answering leads to believing it was too short. 
 
-# Plot missing values
-ggplot(missing_df, aes(x = column, y = missing_percent)) +
-  geom_bar(stat = "identity", fill = "steelblue") +
-  labs(
-    title = "Percentage of Missing Values per Column",
-    x = "Columns",
-    y = "Missing Values (%)"
-  ) +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
-```
-
+We additionally look at data on whether the question is a required question. We notice that certain non-required questions also have very few missing values, indicating user keenness on answering these questions, such as their current development type (i.e. job) and questions regarding their experience with Stack Overflow. We also notice how even certain required questions have high missing values, which perhaps indicates a systemic flaw. We are considering dropping the rows where a required question was not answered, since this likely indicates an incomplete survey that was wrongly submitted.
