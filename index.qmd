@@ -12,3 +12,7 @@ environments shaping their work.
 Questions we want to answer:
 1. Demographic study of respondents including education, work and culture.
 2. To understand developers' perspective on AI in the workplace.
+3. Stackoverflow usage
+
+As we explore the data further and discover patterns, the list of questions will
+be updated.
