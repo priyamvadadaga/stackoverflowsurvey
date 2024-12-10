@@ -32,6 +32,22 @@ selected$AIThreat <- factor(selected$AIThreat, levels = AIThreat_order, ordered 
 
 AISent_order <- c('Unsure', 'Very unfavorable', 'Unfavorable', 'Indifferent', 'Favorable', 'Very favorable')
 selected$AISent <- factor(selected$AISent, levels = AISent_order, ordered = TRUE)
+=======
+library(forcats)
+
+# Reorder DevType and place NA at the bottom
+avg_years_code_pro <- avg_years_code_pro %>%
+  mutate(DevType = fct_explicit_na(DevType, na_level = "NA")) %>%
+  mutate(DevType = fct_rev(DevType))  # Reverse factor levels
+
+# Create the Cleveland dot plot
+ggplot(avg_years_code_pro, aes(x = avg_years_code_pro, y = reorder(DevType, avg_years_code_pro))) +
+  geom_point(color = "skyblue", size = 2) +  # Use points instead of bars
+  labs(x = "Average Years of Professional Coding", y = "Developer Type", 
+       title = "Average Years of Professional Coding by Developer Type") +
+  theme_minimal() +  # Cleaner theme
+  theme(axis.text.y = element_text(size = 10),  # Adjust y-axis text size
+        axis.title = element_text(size = 12))  # Adjust axis title size
 
 AIComplex_order <- c('Very poor at handling complex tasks', 'Bad at handling complex tasks', 'Neither good or bad at handling complex tasks', 'Good, but not great at handling complex tasks', 'Very well at handling complex tasks')
 selected$AIComplex <- factor(selected$AIComplex, levels = AIComplex_order, ordered = TRUE)
@@ -44,6 +60,7 @@ filtered_data <- selected %>%
   filter(MainBranch == "I am a developer by profession") %>%
   filter(!is.na(AISelect) & !is.na(AISent) & !is.na(AIAcc) & !is.na(AIComplex) & !is.na(AIThreat))
 ```
+
 ```{r}
 #| fig-width: 12
 #| fig-height: 10
@@ -164,5 +181,213 @@ ggplot(df_summary, aes(x = Var1, y = Var2, fill=)) +
        x = "AISelect",
        y = "Age") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
+=======
+```
+```{r fig.width= 10}
+
+
+ggplot(selected, aes(x = DevType, fill = RemoteWork)) +
+  geom_bar(position = "fill") +
+  labs(x = "Developer Type", y = "Proportion of Remote Work", 
+       title = "Proportion of Remote Work by Developer Type") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+```{r fig.width=8, fig.height=8}
+ggplot(selected %>% filter(!is.na(RemoteWork)), aes(x = as.factor(AISelect), y = as.numeric(JobSat))) +
+  geom_jitter(aes(), alpha = 0.1, width = 0.2) +  # Add jitter for better visibility
+  labs(x = "AI Tool Selection", y = "Job Satisfaction",
+       title = "AI Tool Usage vs Job Satisfaction by Age") +
+  facet_wrap(~ Age) +  # Facet by RemoteWork status
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+
+```
+
+```{r}
+ggplot(selected, aes(x = as.factor(AISelect), y = as.numeric(JobSat))) +
+  geom_jitter(aes(), alpha = 0.1, width = 0.2) +  # Add jitter for better visibility
+  labs(x = "AI Tool Selection", y = "Job Satisfaction",
+       title = "AI Tool Usage vs Job Satisfaction by Age") +
+  facet_wrap(~ SOVisitFreq) +  # Facet by RemoteWork status
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+```{r}
+ggplot(selected, aes(x = AISelect, y = as.numeric(JobSat), fill = AISelect)) +
+  geom_boxplot(alpha = 0.6) +
+  labs(x = "AI Tool Selection", y = "Job Satisfaction", 
+       title = "Job Satisfaction by AI Tool Selection") +
+  facet_wrap(~ RemoteWork) +  # Facet by RemoteWork
+  scale_fill_manual(values = c("lightblue", "lightgreen", "lightcoral")) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+```{r}
+# Categorize JobSat into 3 levels
+selected <- selected %>%
+  mutate(JobSat_Grouped = case_when(
+    as.numeric(as.character(JobSat)) >= 0 & as.numeric(as.character(JobSat)) <= 3 ~ "Low",
+    as.numeric(as.character(JobSat)) >= 4 & as.numeric(as.character(JobSat)) <= 7 ~ "Medium",
+    as.numeric(as.character(JobSat)) >= 8 & as.numeric(as.character(JobSat)) <= 10 ~ "High",
+    TRUE ~ NA_character_ # Keep NA for missing or invalid data
+  ))
+
+# Remove rows with NA in JobSat_Grouped or WorkExp
+selected <- selected %>%
+  filter(!is.na(JobSat_Grouped) & !is.na(WorkExp))
+
+# Create the plot
+ggplot(selected, aes(x = WorkExp, fill = JobSat_Grouped)) +
+  geom_density(alpha = 0.6) +
+  labs(x = "Work Experience (Years)", y = "Density", 
+       title = "Density of Work Experience by Job Satisfaction Categories") +
+  facet_wrap(~ RemoteWork) +  # Facet by RemoteWork
+  scale_fill_manual(values = c("skyblue", "lightgreen", "lightcoral"),  # Adjust colors for 3 categories
+                    name = "Job Satisfaction") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+```{r}
+ggplot(selected, aes(x = SOPartFreq, fill = RemoteWork)) +
+  geom_bar(position = "dodge", color = "black") +
+  labs(x = "Participation Frequency", 
+       y = "Count", 
+       fill = "Remote Work Setup",
+       title = "Participation Frequency vs. Remote Work Setup") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+
+```{r}
+ggplot(selected, aes(x = SOVisitFreq, fill = SOPartFreq)) +
+  geom_bar(position = "fill", color = "black") +
+  labs(x = "Visit Frequency", 
+       y = "Proportion", 
+       fill = "Participation Frequency",
+       title = "Relationship Between Visit and Participation Frequency") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+
+
+```{r}
+str(selected)
+```
+
+```{r}
+# Load necessary libraries
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(viridis)
+library(maps)
+
+# Load map data
+map_data <- map_data("world")
+
+# Summarize Job Satisfaction data by country
+job_sat_data <- selected %>%
+  filter(!is.na(JobSat_Grouped)) %>% # Remove missing values
+  group_by(Country, JobSat_Grouped) %>%
+  tally() %>%
+  spread(JobSat_Grouped, n, fill = 0) %>%
+  mutate(
+    Total = High + Medium + Low,
+    High_Proportion = High / Total * 100 # Proportion of "High" satisfaction
+  )
+
+# Merge map data with summarized job satisfaction data
+merged_data <- left_join(map_data, job_sat_data, by = c("region" = "Country"))
+
+# Plot the choropleth map
+ggplot(merged_data, aes(x = long, y = lat, group = group, fill = High_Proportion)) +
+  geom_polygon(color = "black", size = 0.1) +
+  scale_fill_viridis(option = "magma", direction = -1, name = "High Job Sat (%)") +
+  theme_void() +
+  labs(title = "Job Satisfaction (High) Proportion by Country")
+```
+```{r}
+library(ggplot2)
+library(dplyr)
+
+# Prepare data: Count frequency of combinations of AIThreat and AISent
+ai_threat_sentiment <- selected %>%
+  filter(!is.na(AIThreat) & !is.na(AISent)) %>%
+  count(AIThreat, AISent)
+
+# Create a stacked bar plot
+ggplot(ai_threat_sentiment, aes(x = AISent, y = n, fill = AIThreat)) +
+  geom_bar(stat = "identity") +
+  labs(title = "AI Threat Perception vs AI Sentiment",
+       x = "AI Sentiment",
+       y = "Count",
+       fill = "AI Threat") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+```
+```{r}
+# Load necessary libraries
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(viridis)
+library(maps)
+
+# Assume 'selected' is the dataset you're working with
+
+# Step 1: Summarize the average Job Satisfaction by country
+job_sat_data <- selected %>%
+  filter(!is.na(JobSat)) %>%  # Remove rows with missing job satisfaction data
+  group_by(Country) %>%  # Group by country
+  summarise(AvgJobSat = mean(as.numeric(as.character(JobSat)), na.rm = TRUE))  # Calculate average job satisfaction
+
+# Step 2: Get map data
+map_data <- map_data("world")
+
+# Step 3: Merge the map data with the summarized job satisfaction data
+merged_data <- left_join(map_data, job_sat_data, by = c("region" = "Country"))
+
+# Step 4: Plot the choropleth map
+ggplot(merged_data, aes(x = long, y = lat, group = group, fill = AvgJobSat)) +
+  geom_polygon(color = "black", size = 0.1) +  # Draw polygons with black borders
+  scale_fill_viridis(option = "magma", direction = -1, name = "Avg Job Sat") +  # Use 'viridis' color scale for better visibility
+  theme_void() +  # Remove axis and grid lines for a cleaner map
+  labs(title = "Average Job Satisfaction by Country")  # Add title
+
+```
+```{r}
+# Load necessary libraries
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(viridis)
+library(maps)
+
+# Step 1: Summarize the proportion of people who think AI is a threat by country
+ai_threat_data <- selected %>%
+  filter(!is.na(AIThreat)) %>%  # Remove rows with missing data
+  group_by(Country) %>%  # Group by country
+  summarise(
+    ThreatCount = sum(AIThreat == "Yes", na.rm = TRUE),  # Count how many think AI is a threat
+    TotalCount = n(),  # Count the total number of responses
+    ProportionThreat = ThreatCount / TotalCount * 100  # Calculate the proportion
+  )
+
+# Step 2: Get map data
+map_data <- map_data("world")
+
+# Step 3: Merge the map data with the summarized AI threat data
+merged_data <- left_join(map_data, ai_threat_data, by = c("region" = "Country"))
+
+# Step 4: Plot the choropleth map
+ggplot(merged_data, aes(x = long, y = lat, group = group, fill = ProportionThreat)) +
+  geom_polygon(color = "black", size = 0.1) +  # Draw polygons with black borders
+  scale_fill_viridis(option = "magma", direction = -1, name = "AI Threat Proportion (%)") +  # Use 'viridis' color scale
+  theme_void() +  # Remove axis and grid lines for a cleaner map
+  labs(title = "Proportion of People Who Think AI is a Threat by Country")  # Add title
 
 ```
