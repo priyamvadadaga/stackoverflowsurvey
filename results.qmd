@@ -32,22 +32,6 @@ selected$AIThreat <- factor(selected$AIThreat, levels = AIThreat_order, ordered 
 
 AISent_order <- c('Unsure', 'Very unfavorable', 'Unfavorable', 'Indifferent', 'Favorable', 'Very favorable')
 selected$AISent <- factor(selected$AISent, levels = AISent_order, ordered = TRUE)
-=======
-library(forcats)
-
-# Reorder DevType and place NA at the bottom
-avg_years_code_pro <- avg_years_code_pro %>%
-  mutate(DevType = fct_explicit_na(DevType, na_level = "NA")) %>%
-  mutate(DevType = fct_rev(DevType))  # Reverse factor levels
-
-# Create the Cleveland dot plot
-ggplot(avg_years_code_pro, aes(x = avg_years_code_pro, y = reorder(DevType, avg_years_code_pro))) +
-  geom_point(color = "skyblue", size = 2) +  # Use points instead of bars
-  labs(x = "Average Years of Professional Coding", y = "Developer Type", 
-       title = "Average Years of Professional Coding by Developer Type") +
-  theme_minimal() +  # Cleaner theme
-  theme(axis.text.y = element_text(size = 10),  # Adjust y-axis text size
-        axis.title = element_text(size = 12))  # Adjust axis title size
 
 AIComplex_order <- c('Very poor at handling complex tasks', 'Bad at handling complex tasks', 'Neither good or bad at handling complex tasks', 'Good, but not great at handling complex tasks', 'Very well at handling complex tasks')
 selected$AIComplex <- factor(selected$AIComplex, levels = AIComplex_order, ordered = TRUE)
@@ -81,6 +65,29 @@ ggplot(filtered_data,
   ) +
   ggtitle("Alluvial Diagram for Developers")
 ```
+```{r}
+library(forcats)
+
+# Reorder DevType and place NA at the bottom
+avg_years_code_pro <- selected %>%
+  group_by(DevType) %>%
+  summarize(avg_years_code_pro = mean(as.numeric(YearsCodePro), na.rm = TRUE))
+
+avg_years_code_pro <- avg_years_code_pro %>%
+  mutate(DevType = fct_explicit_na(DevType, na_level = "NA")) %>%
+  mutate(DevType = fct_rev(DevType))  # Reverse factor levels
+
+# Create the Cleveland dot plot
+ggplot(avg_years_code_pro, aes(x = avg_years_code_pro, y = reorder(DevType, avg_years_code_pro))) +
+  geom_point(color = "skyblue", size = 2) +  # Use points instead of bars
+  labs(x = "Average Years of Professional Coding", y = "Developer Type", 
+       title = "Average Years of Professional Coding by Developer Type") +
+  theme_minimal() +  # Cleaner theme
+  theme(axis.text.y = element_text(size = 10),  # Adjust y-axis text size
+        axis.title = element_text(size = 12))  # Adjust axis title size
+
+```
+
 ```{r}
 #| fig-width: 12
 SOVisitFreq_order <- c('Less than once per month or monthly', 'A few times per month or weekly', 'A few times per week', 'Daily or almost daily', 'Multiple times per day')
@@ -181,7 +188,7 @@ ggplot(df_summary, aes(x = Var1, y = Var2, fill=)) +
        x = "AISelect",
        y = "Age") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
-=======
+
 ```
 ```{r fig.width= 10}
 
