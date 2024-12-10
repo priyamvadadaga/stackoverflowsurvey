@@ -1,1 +1,169 @@
 # Results
+
+```{r}
+library(tidyverse)
+library(dplyr)
+
+survey <- read.csv('data/survey_results_public.csv')
+schema <- read.csv('data/survey_results_schema.csv')
+
+# ncol(survey)
+# nrow(survey)
+
+keep <- c('MainBranch', 'Age', 'RemoteWork', 'Check', 'EdLevel', 'YearsCode', 'YearsCodePro', 'DevType', 'Country', 'ConvertedCompYearly', 'SOVisitFreq', 'SOAccount', 'SOPartFreq', 'SOComm', 'AISelect', 'AISent', 'AIAcc', 'AIComplex', 'AIThreat', 'ICorPM', 'WorkExp', 'Knowledge_1', 'Knowledge_2', 'Knowledge_3', 'Knowledge_4', 'Knowledge_5', 'Knowledge_6', 'Knowledge_7', 'Knowledge_8', 'Knowledge_9', 'TimeSearching', 'TimeAnswering', 'ProfessionalCloud', 'ProfessionalQuestion', 'Industry', 'JobSat', 'SurveyLength', 'SurveyEase')
+
+
+selected <- survey |> dplyr::select(all_of(keep))
+
+# colSums(is.na(selected))
+# colMeans(is.na(selected)) * 100
+
+selected <- selected |>
+  mutate(across(c('MainBranch', 'Age', 'RemoteWork', 'Check', 'EdLevel', 'DevType', 'SOVisitFreq', 'SOAccount', 'SOPartFreq', 'SOComm', 'AISelect', 'AISent', 'AIAcc', 'AIComplex', 'AIThreat', 'ICorPM', 'Knowledge_1', 'Knowledge_2', 'Knowledge_3', 'Knowledge_4', 'Knowledge_5', 'Knowledge_6', 'Knowledge_7', 'Knowledge_8', 'Knowledge_9', 'TimeSearching', 'TimeAnswering', 'ProfessionalCloud', 'ProfessionalQuestion', 'JobSat', 'SurveyLength', 'SurveyEase'), as.factor))
+```
+
+```{r}
+library(ggplot2)
+library(ggalluvial)
+library(dplyr)
+
+AIThreat_order <- c('No', 'Unsure', 'Yes')
+selected$AIThreat <- factor(selected$AIThreat, levels = AIThreat_order, ordered = TRUE)
+
+AISent_order <- c('Unsure', 'Very unfavorable', 'Unfavorable', 'Indifferent', 'Favorable', 'Very favorable')
+selected$AISent <- factor(selected$AISent, levels = AISent_order, ordered = TRUE)
+
+AIComplex_order <- c('Very poor at handling complex tasks', 'Bad at handling complex tasks', 'Neither good or bad at handling complex tasks', 'Good, but not great at handling complex tasks', 'Very well at handling complex tasks')
+selected$AIComplex <- factor(selected$AIComplex, levels = AIComplex_order, ordered = TRUE)
+
+AIAcc_order <- c('Highly distrust', 'Somewhat distrust', 'Neither trust nor distrust', 'Somewhat trust', 'Highly trust')
+selected$AIAcc <- factor(selected$AIAcc, levels = AIAcc_order, ordered = TRUE)
+
+# Clean data to remove rows with NA values
+filtered_data <- selected %>%
+  filter(MainBranch == "I am a developer by profession") %>%
+  filter(!is.na(AISelect) & !is.na(AISent) & !is.na(AIAcc) & !is.na(AIComplex) & !is.na(AIThreat))
+```
+```{r}
+#| fig-width: 12
+#| fig-height: 10
+ggplot(filtered_data,
+       aes(axis1 = AIThreat, axis2 = AIComplex, axis3 = AISent, axis4 = AIAcc)) +
+  geom_alluvium(aes(fill = AIAcc)) +
+  geom_stratum(aes(fill = AIAcc), color = "black", size = 0.5) +
+  geom_text(stat = "stratum", aes(label = after_stat(stratum)), size = 2.5, color = "black") +
+  scale_x_discrete(limits = c("AIThreat", "AIComplex", "AISent", "AIAcc"),
+                   expand = c(0.15, 0.15)) +
+  scale_fill_brewer(palette = "RdYlBu") +
+  theme_void() +
+  theme(
+    strip.text = element_text(size = 10),
+    axis.text = element_text(size = 8),
+    axis.title = element_text(size = 10),
+    plot.title = element_text(size = 14)
+  ) +
+  ggtitle("Alluvial Diagram for Developers")
+```
+```{r}
+#| fig-width: 12
+SOVisitFreq_order <- c('Less than once per month or monthly', 'A few times per month or weekly', 'A few times per week', 'Daily or almost daily', 'Multiple times per day')
+selected$SOVisitFreq <- factor(selected$SOVisitFreq, levels = SOVisitFreq_order, ordered = TRUE)
+
+filtered_data <- selected |>
+  filter(!is.na(AISelect) & !is.na(SOVisitFreq))
+
+contingency_table <- table(filtered_data$SOVisitFreq, filtered_data$AISelect)
+
+mosaicplot(contingency_table, color=TRUE, shade=TRUE, las = 1)
+```
+
+```{r}
+require(HH)
+require(grid)
+require(lattice)
+require(latticeExtra)
+
+df_long <- selected %>%
+  pivot_longer(cols = starts_with("Knowledge_"),
+               names_to = "Question",
+               values_to = "Response")
+
+df_counts <- df_long %>%
+  count(Question, Response) %>%
+  pivot_wider(names_from = Response, values_from = n, values_fill = list(n = 0))
+
+likert(Question ~ .,data=df_counts, ylab=NULL, ReferenceZero=3,
+  as.percent=TRUE,
+  main = list("Team-Related Questions",x=unit(.55, "npc")),
+   xlim=c(-40,-20,0,20,40,60,80,100), strip=FALSE,
+   par.strip.text=list(cex=.7))
+```
+
+```{r}
+library(viridis)
+library(plotly)
+
+AI_survey <- read.csv('data/parsed_AItools.csv')
+AI <- subset(AI_survey, select = -X)
+
+data_long <- AI %>%
+  pivot_longer(cols = -index, names_to = "category", values_to = "value")
+
+data_long
+
+ggplot(data_long, aes(x = index, y = value, fill = category)) +
+    geom_bar(stat = "identity", position = "fill") +  # Use "fill" for proportions
+  labs(x = "Activity", y = "Count", title = "Which parts of your development workflow are you currently using AI tools for\nand which are you interested in using AI tools for over the next year?") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+ggplot(data_long, aes(x = index, y = category, fill = value)) +
+  geom_tile() +
+  scale_fill_viridis(option = "C") +  # Color scale
+  labs(x = "Activity", y = "Category", title = "Heatmap of Interest in Development Activities") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplot(data_long, aes(x = index, y = value, color = category)) +
+  geom_point(position = position_jitter(width = 0.1, height = 0), size = 3) +
+  labs(x = "Activity", y = "Count", title = "Dot Plot of Interest in Development Activities") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  scale_color_manual(values = c("Currently_Using" = "blue", 
+                               "Interested_in_Using" = "orange", 
+                               "Not_interested_in_Using" = "gray"))
+
+plot_ly(data_long, x = ~index, y = ~value, color = ~category, type = 'bar', 
+        text = ~paste("Count: ", value), hoverinfo = 'text') %>%
+  layout(
+    title = "Interest in Different Development Activities",
+    xaxis = list(title = "Activity"),
+    yaxis = list(title = "Count"),
+    barmode = "dodge"
+  )
+```
+
+```{r}
+ggplot(selected, aes(x = AISelect, y = Age)) +
+  geom_jitter(aes(color = AISelect), width = 0.1, height = 0.1, alpha = 0.05) +
+  theme_minimal() +
+  labs(title = "Jitter Plot of AISelect vs Age",
+       x = "AISelect",
+       y = "Age")
+```
+
+```{r}
+# Load necessary libraries
+library(ggplot2)
+
+df_summary <- as.data.frame(table(selected$AISelect, selected$Age))
+
+
+ggplot(df_summary, aes(x = Var1, y = Var2, fill=Freq)) +
+  geom_tile() +
+  scale_fill_viridis_c() +  # Use a color scale to show density
+  theme_minimal() +
+  labs(title = "Heatmap of Counts for AISelect and Age",
+       x = "AISelect",
+       y = "Age") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```

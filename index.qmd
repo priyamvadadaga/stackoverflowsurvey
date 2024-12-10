@@ -3,8 +3,11 @@ Before OpenAI and other LLMs were built, StackOverflow was the go-to source for 
 This data can provide valuable insights into the current state of the tech industry. As individuals who work in tech or aim to work in tech, understanding these trends is both interesting and essential These insights are crucial for understanding how the industry is evolving and how developers feel about the tools, skills, and environments shaping their work. 
 
 Questions we're interested in:
+
 1. Demographics of respondents: to understand the landscape of users StackOverflow caters to
+
 2. Perspectives on AI: to understand developers' views on AI in the workplace, especially in the world of generative AI as a threat to certain jobs
+
 3. StackOverflow usage: With the advent of GPT, LLama and other LLM's, how developers' perspectives on more "traditional" sources like StackOverflow are changing and whether it still adequately meets their needs.
 
 (As we explore the data further and discover patterns, we will refine and update our research questions.)
