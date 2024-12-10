@@ -1,1 +1,145 @@
 # Results
+```{r}
+# GRAPH 1
+library(ggplot2)
+
+selected$Age <- factor(selected$Age, levels = c("Under 18 years old", 
+                                                "18-24 years old", 
+                                                "25-34 years old", 
+                                                "35-44 years old", 
+                                                "45-54 years old", 
+                                                "55-64 years old", 
+                                                "65 years or older","Prefer not to say"))
+
+ggplot(selected, aes(x = Age)) +
+  geom_histogram(stat = "count", fill = "steelblue", color = "black", width = 1) +
+  labs(title = "Distribution of Age", x = "Age", y = "Count") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) 
+
+```
+```{r}
+library(dplyr)
+
+# Calculate average YearsCodePro for each DevType
+avg_years_code_pro <- selected %>%
+  group_by(DevType) %>%
+  summarize(avg_years_code_pro = mean(as.numeric(YearsCodePro), na.rm = TRUE))
+
+# Create the bar plot
+ggplot(avg_years_code_pro, aes(x = reorder(DevType, avg_years_code_pro), y = avg_years_code_pro)) +
+  geom_bar(stat = "identity", fill = "skyblue") +
+  labs(x = "Developer Type", y = "Average Years of Professional Coding", 
+       title = "Average Years of Professional Coding by Developer Type") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))  # Rotate x-axis labels
+
+```
+```{r}
+# Load necessary libraries
+library(dplyr)
+library(ggplot2)
+library(scales) # For formatting salary as currency
+library(ggrepel) # For better label placement
+
+# Calculate median salary and average experience
+graph_data <- selected %>%
+  group_by(DevType) %>%
+  summarize(
+    MedianSalary = median(ConvertedCompYearly, na.rm = TRUE),
+    AvgExperience = mean(as.numeric(YearsCodePro), na.rm = TRUE)
+  ) %>%
+  filter(!is.na(MedianSalary) & !is.na(AvgExperience)) # Remove rows with NA values
+
+# Create scatter plot with DevType labels
+ggplot(graph_data, aes(x = AvgExperience, y = MedianSalary)) +
+  geom_point(color = "blue", size = 2, alpha = 0.5) +
+  geom_text_repel(aes(label = DevType), size = 3, max.overlaps = 10) + # Add labels
+  scale_y_continuous(labels = dollar_format(prefix = "$", big.mark = ",")) +
+  labs(
+    title = "Median Yearly Salary vs. Average Years of Professional Experience",
+    x = "Average years of professional experience",
+    y = "Median yearly salary (USD)"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5),
+    panel.grid.minor = element_blank()
+  )
+```
+```{r}
+# Load necessary libraries
+library(dplyr)
+library(ggplot2)
+library(scales)
+
+# Define a mapping of specific roles to broader categories
+role_mapping <- c(
+  'Academic researcher' = 'Research',
+  'Blockchain' = 'Specialized Developer',
+  'Cloud infrastructure engineer' = 'Infrastructure',
+  'Data engineer' = 'Data',
+  'Data or business analyst' = 'Data',
+  'Data scientist or machine learning specialist' = 'Data',
+  'Database administrator' = 'Infrastructure',
+  'Designer' = 'Design',
+  'Developer Advocate' = 'Developer',
+  'Developer Experience' = 'Developer',
+  'Developer, AI' = 'Developer',
+  'Developer, back-end' = 'Developer',
+  'Developer, desktop or enterprise applications' = 'Developer',
+  'Developer, embedded applications or devices' = 'Developer',
+  'Developer, front-end' = 'Developer',
+  'Developer, full-stack' = 'Developer',
+  'Developer, game or graphics' = 'Developer',
+  'Developer, mobile' = 'Developer',
+  'Developer, QA or test' = 'Testing',
+  'DevOps specialist' = 'Infrastructure',
+  'Educator' = 'Education',
+  'Engineer, site reliability' = 'Infrastructure',
+  'Engineering manager' = 'Management',
+  'Hardware Engineer' = 'Hardware',
+  'Marketing or sales professional' = 'Business',
+  'Other (please specify):' = 'Other',
+  'Product manager' = 'Management',
+  'Project manager' = 'Management',
+  'Research & Development role' = 'Research',
+  'Scientist' = 'Research',
+  'Security professional' = 'Security',
+  "Senior Executive (C-Suite, VP, etc.)" = "Management",
+  "Student" = "Education",
+  "System administrator" = "Infrastructure",
+  "NA" = "Other"
+)
+
+# Apply the mapping to group roles
+selected <- selected %>%
+  mutate(GroupedRole = role_mapping[DevType])
+
+# Summarize data by grouped roles
+graph_data <- selected %>%
+  group_by(GroupedRole) %>%
+  summarize(
+    MedianSalary = median(ConvertedCompYearly, na.rm = TRUE),
+    AvgExperience = mean(as.numeric(YearsCodePro), na.rm = TRUE)
+  ) %>%
+  filter(!is.na(MedianSalary) & !is.na(AvgExperience))
+
+
+# Create scatter plot with grouped roles
+ggplot(graph_data, aes(x = AvgExperience, y = MedianSalary)) +
+  geom_point(aes(color = GroupedRole), size = 3) +
+  scale_y_continuous(labels = dollar_format(prefix="$", big.mark=",")) +
+  labs(
+    title="Median Yearly Salary vs. Average Years of Professional Experience",
+    x="Average Years of Professional Experience",
+    y="Median Yearly Salary (USD)",
+    color="Role Category"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title=element_text(hjust=0.5),
+    legend.position="right"
+  )
+
+```
+
