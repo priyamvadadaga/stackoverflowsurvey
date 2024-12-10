@@ -156,8 +156,7 @@ library(ggplot2)
 
 df_summary <- as.data.frame(table(selected$AISelect, selected$Age))
 
-
-ggplot(df_summary, aes(x = Var1, y = Var2, fill=Freq)) +
+ggplot(df_summary, aes(x = Var1, y = Var2, fill=)) +
   geom_tile() +
   scale_fill_viridis_c() +  # Use a color scale to show density
   theme_minimal() +
