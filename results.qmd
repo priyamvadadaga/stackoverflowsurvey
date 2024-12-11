@@ -392,17 +392,6 @@ selected$EdLevel <- factor(selected$EdLevel,
                                       "Professional degree (JD, MD, Ph.D, Ed.D, etc.)",
                                       "Something else"))
 
-# Create the bar plot with the specified order
-ggplot(selected, aes(x = EdLevel)) +
-  geom_bar(fill = "skyblue", color = "black") +
-  labs(
-    title = "Distribution of Highest Level of Formal Education",
-    x = "Education Level",
-    y = "Count"
-  ) +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-  coord_flip()  # Flip the axis if needed for better readability
 
 ggplot(selected, aes(x = EdLevel)) +
   geom_bar(fill = "skyblue", color = "black") +
@@ -430,7 +419,11 @@ treemap(industry_counts_df,
         vColor = "Freq", # Color based on frequency
         palette = "Blues", # Customize the color palette
         draw = TRUE,
+<<<<<<< Updated upstream
         title = "Distribution of Industries of Respondents",
+=======
+        title = "Distribution of Industries",
+>>>>>>> Stashed changes
         fontsize.title = 16,  # Adjust title font size
         fontsize.labels = 12, # Adjust labels font size
         fontsize.legend = 10, # Adjust legend font size
