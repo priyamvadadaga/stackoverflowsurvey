@@ -274,38 +274,6 @@ ggplot(selected_vf_pf, aes(x = SOVisitFreq, fill = SOPartFreq)) +
 ```
 
 ```{r}
-# Load necessary libraries
-library(ggplot2)
-library(dplyr)
-library(tidyr)
-library(viridis)
-library(maps)
-
-# Load map data
-map_data <- map_data("world")
-
-# Summarize Job Satisfaction data by country
-job_sat_data <- selected %>%
-  filter(!is.na(JobSat_Grouped)) %>% # Remove missing values
-  group_by(Country, JobSat_Grouped) %>%
-  tally() %>%
-  spread(JobSat_Grouped, n, fill = 0) %>%
-  mutate(
-    Total = High + Medium + Low,
-    High_Proportion = High / Total * 100 # Proportion of "High" satisfaction
-  )
-
-# Merge map data with summarized job satisfaction data
-merged_data <- left_join(map_data, job_sat_data, by = c("region" = "Country"))
-
-# Plot the choropleth map
-ggplot(merged_data, aes(x = long, y = lat, group = group, fill = High_Proportion)) +
-  geom_polygon(color = "black", size = 0.1) +
-  scale_fill_viridis(option = "magma", direction = -1, name = "High Job Sat (%)") +
-  theme_void() +
-  labs(title = "Job Satisfaction (High) Proportion by Country")
-```
-```{r}
 library(ggplot2)
 library(dplyr)
 
@@ -443,11 +411,7 @@ treemap(industry_counts_df,
         vColor = "Freq", # Color based on frequency
         palette = "Blues", # Customize the color palette
         draw = TRUE,
-<<<<<<< Updated upstream
         title = "Distribution of Industries of Respondents",
-=======
-        title = "Distribution of Industries",
->>>>>>> Stashed changes
         fontsize.title = 16,  # Adjust title font size
         fontsize.labels = 12, # Adjust labels font size
         fontsize.legend = 10, # Adjust legend font size
