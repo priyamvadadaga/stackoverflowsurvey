@@ -274,13 +274,18 @@ ggplot(selected, aes(x = SOPartFreq, fill = RemoteWork)) +
 ```
 
 ```{r}
-ggplot(selected, aes(x = SOVisitFreq, fill = SOPartFreq)) +
+selected_vf_pf <- selected %>%
+  filter(!is.na(SOVisitFreq) & !is.na(SOPartFreq))
+
+# Create the plot
+ggplot(selected_vf_pf, aes(x = SOVisitFreq, fill = SOPartFreq)) +
   geom_bar(position = "fill", color = "black") +
   labs(x = "Visit Frequency", 
        y = "Proportion", 
        fill = "Participation Frequency",
        title = "Relationship Between Visit and Participation Frequency") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
 
 ```
 
