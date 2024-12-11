@@ -26,6 +26,7 @@ selected <- selected |>
 library(ggplot2)
 library(ggalluvial)
 library(dplyr)
+library(plotly)
 
 AIThreat_order <- c('No', 'Unsure', 'Yes')
 selected$AIThreat <- factor(selected$AIThreat, levels = AIThreat_order, ordered = TRUE)
@@ -43,26 +44,31 @@ selected$AIAcc <- factor(selected$AIAcc, levels = AIAcc_order, ordered = TRUE)
 filtered_data <- selected %>%
   filter(MainBranch == "I am a developer by profession") %>%
   filter(!is.na(AISelect) & !is.na(AISent) & !is.na(AIAcc) & !is.na(AIComplex) & !is.na(AIThreat))
+
+alluvial_data <- filtered_data |>
+  group_by(AIThreat, AIComplex, AISent, AIAcc) |>
+  summarise(Freq = n()) |>
+  ungroup()
+
 ```
 ```{r}
 #| fig-width: 12
 #| fig-height: 10
-ggplot(filtered_data,
-       aes(axis1 = AIThreat, axis2 = AIComplex, axis3 = AISent, axis4 = AIAcc)) +
-  geom_alluvium(aes(fill = AIAcc)) +
-  geom_stratum(aes(fill = AIAcc), color = "black", size = 0.5) +
-  geom_text(stat = "stratum", aes(label = after_stat(stratum)), size = 2.5, color = "black") +
-  scale_x_discrete(limits = c("AIThreat", "AIComplex", "AISent", "AIAcc"),
-                   expand = c(0.15, 0.15)) +
-  scale_fill_brewer(palette = "RdYlBu") +
-  theme_void() +
-  theme(
-    strip.text = element_text(size = 10),
-    axis.text = element_text(size = 8),
-    axis.title = element_text(size = 10),
-    plot.title = element_text(size = 14)
-  ) +
-  ggtitle("Alluvial Diagram for Developers")
+ggplot(alluvial_data,
+       aes(axis1 = AIThreat, axis2 = AIComplex, axis3 = AISent, axis4 = AIAcc, y = Freq)) +
+  geom_alluvium(aes(fill = AIAcc), alpha = 0.8) +
+  geom_stratum(color = "gray", fill = "lightgray", alpha = 0.9) +
+  geom_text(stat = "stratum", aes(label = after_stat(stratum)), 
+            size = 2.5, color = "black", vjust = -0.5) +
+  scale_x_discrete(limits = c("AI Threat", "Complexity", "Sentiment", "Accuracy"),
+                   expand = c(0.2, 0.2)) +
+  scale_fill_brewer(palette = "RdYlBu", name = "Trust Level") +
+  theme_minimal(base_size = 8) +
+  labs(title = "Alluvial Diagram for Developers",
+       x = NULL,
+       y = "Frequency") -> p
+
+ggplotly(p)
 ```
 ```{r}
 #| fig-width: 12
