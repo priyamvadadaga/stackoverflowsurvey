@@ -1,5 +1,6 @@
 # Results
 
+
 ```{r}
 library(tidyverse)
 library(dplyr)
@@ -65,6 +66,7 @@ ggplot(filtered_data,
   ) +
   ggtitle("Alluvial Diagram for Developers")
 ```
+
 ```{r}
 library(forcats)
 
@@ -188,6 +190,7 @@ ggplot(df_summary, aes(x = Var1, y = Var2, fill=)) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 ```
+
 ```{r fig.width= 10}
 
 
@@ -198,6 +201,7 @@ ggplot(selected, aes(x = DevType, fill = RemoteWork)) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 ```
+
 ```{r fig.width=8, fig.height=8}
 ggplot(selected %>% filter(!is.na(RemoteWork)), aes(x = as.factor(AISelect), y = as.numeric(JobSat))) +
   geom_jitter(aes(), alpha = 0.1, width = 0.2) +  # Add jitter for better visibility
@@ -219,6 +223,7 @@ ggplot(selected, aes(x = as.factor(AISelect), y = as.numeric(JobSat))) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 ```
+
 ```{r}
 ggplot(selected, aes(x = AISelect, y = as.numeric(JobSat), fill = AISelect)) +
   geom_boxplot(alpha = 0.6) +
@@ -254,6 +259,7 @@ ggplot(selected, aes(x = WorkExp, fill = JobSat_Grouped)) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 ```
+
 ```{r}
 ggplot(selected, aes(x = SOPartFreq, fill = RemoteWork)) +
   geom_bar(position = "dodge", color = "black") +
@@ -275,7 +281,6 @@ ggplot(selected, aes(x = SOVisitFreq, fill = SOPartFreq)) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 ```
-
 
 ```{r}
 str(selected)
@@ -313,6 +318,7 @@ ggplot(merged_data, aes(x = long, y = lat, group = group, fill = High_Proportion
   theme_void() +
   labs(title = "Job Satisfaction (High) Proportion by Country")
 ```
+
 ```{r}
 library(ggplot2)
 library(dplyr)
@@ -334,6 +340,7 @@ ggplot(ai_threat_sentiment, aes(x = AISent, y = n, fill = AIThreat)) +
 
 
 ```
+
 ```{r}
 # Load necessary libraries
 library(ggplot2)
@@ -364,6 +371,7 @@ ggplot(merged_data, aes(x = long, y = lat, group = group, fill = AvgJobSat)) +
   labs(title = "Average Job Satisfaction by Country")  # Add title
 
 ```
+
 ```{r}
 # Load necessary libraries
 library(ggplot2)
@@ -396,6 +404,7 @@ ggplot(merged_data, aes(x = long, y = lat, group = group, fill = ProportionThrea
   labs(title = "Proportion of People Who Think AI is a Threat by Country")  # Add title
 
 ```
+
 ```{r fig.height=10}
 library(ggplot2)
 
@@ -434,6 +443,7 @@ ggplot(selected, aes(x = EdLevel)) +
 
 
 ```
+
 ```{r}
 # Install and load treemap package
 library(treemap)
@@ -457,6 +467,4 @@ treemap(education_counts_df,
 )
 
 ```
-
-
 
