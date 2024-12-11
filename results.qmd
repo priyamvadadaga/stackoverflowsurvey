@@ -217,14 +217,6 @@ ggplot(selected, aes(x = DevType, fill = RemoteWork)) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 ```
-```{r fig.width=8, fig.height=8}
-ggplot(selected %>% filter(!is.na(RemoteWork)), aes(x = as.factor(AISelect), y = as.numeric(JobSat))) +
-  geom_jitter(aes(), alpha = 0.1, width = 0.2) +  # Add jitter for better visibility
-  labs(x = "AI Tool Selection", y = "Job Satisfaction",
-       title = "AI Tool Usage vs Job Satisfaction by Age") +
-  facet_wrap(~ Age) +  # Facet by RemoteWork status
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
-```
 
 ```{r}
 ggplot(selected, aes(x = as.factor(AISelect), y = as.numeric(JobSat))) +
@@ -234,15 +226,6 @@ ggplot(selected, aes(x = as.factor(AISelect), y = as.numeric(JobSat))) +
   facet_wrap(~ SOVisitFreq) +  # Facet by RemoteWork status
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
-```
-```{r}
-ggplot(selected, aes(x = AISelect, y = as.numeric(JobSat), fill = AISelect)) +
-  geom_boxplot(alpha = 0.6) +
-  labs(x = "AI Tool Selection", y = "Job Satisfaction", 
-       title = "Job Satisfaction by AI Tool Selection") +
-  facet_wrap(~ RemoteWork) +  # Facet by RemoteWork
-  scale_fill_manual(values = c("lightblue", "lightgreen", "lightcoral")) +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
 
@@ -443,11 +426,9 @@ treemap(industry_counts_df,
         vColor = "Freq", # Color based on frequency
         palette = "Blues", # Customize the color palette
         draw = TRUE,
-<<<<<<< Updated upstream
         title = "Distribution of Industries of Respondents",
-=======
-        title = "Distribution of Industries",
->>>>>>> Stashed changes
+
+
         fontsize.title = 16,  # Adjust title font size
         fontsize.labels = 12, # Adjust labels font size
         fontsize.legend = 10, # Adjust legend font size
