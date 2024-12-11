@@ -245,31 +245,7 @@ ggplot(selected, aes(x = AISelect, y = as.numeric(JobSat), fill = AISelect)) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
-```{r}
-# Categorize JobSat into 3 levels
-selected <- selected %>%
-  mutate(JobSat_Grouped = case_when(
-    as.numeric(as.character(JobSat)) >= 0 & as.numeric(as.character(JobSat)) <= 3 ~ "Low",
-    as.numeric(as.character(JobSat)) >= 4 & as.numeric(as.character(JobSat)) <= 7 ~ "Medium",
-    as.numeric(as.character(JobSat)) >= 8 & as.numeric(as.character(JobSat)) <= 10 ~ "High",
-    TRUE ~ NA_character_ # Keep NA for missing or invalid data
-  ))
 
-# Remove rows with NA in JobSat_Grouped or WorkExp
-selected <- selected %>%
-  filter(!is.na(JobSat_Grouped) & !is.na(WorkExp))
-
-# Create the plot
-ggplot(selected, aes(x = WorkExp, fill = JobSat_Grouped)) +
-  geom_density(alpha = 0.6) +
-  labs(x = "Work Experience (Years)", y = "Density", 
-       title = "Density of Work Experience by Job Satisfaction Categories") +
-  facet_wrap(~ RemoteWork) +  # Facet by RemoteWork
-  scale_fill_manual(values = c("skyblue", "lightgreen", "lightcoral"),  # Adjust colors for 3 categories
-                    name = "Job Satisfaction") +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
-
-```
 ```{r}
 ggplot(selected, aes(x = SOPartFreq, fill = RemoteWork)) +
   geom_bar(position = "dodge", color = "black") +
@@ -295,11 +271,6 @@ ggplot(selected_vf_pf, aes(x = SOVisitFreq, fill = SOPartFreq)) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 
-```
-
-
-```{r}
-str(selected)
 ```
 
 ```{r}
@@ -445,17 +416,6 @@ selected$EdLevel <- factor(selected$EdLevel,
                                       "Professional degree (JD, MD, Ph.D, Ed.D, etc.)",
                                       "Something else"))
 
-# Create the bar plot with the specified order
-ggplot(selected, aes(x = EdLevel)) +
-  geom_bar(fill = "skyblue", color = "black") +
-  labs(
-    title = "Distribution of Highest Level of Formal Education",
-    x = "Education Level",
-    y = "Count"
-  ) +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-  coord_flip()  # Flip the axis if needed for better readability
 
 ggplot(selected, aes(x = EdLevel)) +
   geom_bar(fill = "skyblue", color = "black") +
@@ -474,16 +434,20 @@ ggplot(selected, aes(x = EdLevel)) +
 library(treemap)
 
 # Create a treemap for education levels
-education_counts_df <- as.data.frame(table(selected$EdLevel))
+industry_counts_df <- as.data.frame(table(selected$Industry))
 
 # Create the treemap with labels and legend
-treemap(education_counts_df,
+treemap(industry_counts_df,
         index = "Var1",  # Category variable
         vSize = "Freq",  # Size based on frequency
         vColor = "Freq", # Color based on frequency
         palette = "Blues", # Customize the color palette
         draw = TRUE,
-        title = "Distribution of Highest Level of Formal Education",
+<<<<<<< Updated upstream
+        title = "Distribution of Industries of Respondents",
+=======
+        title = "Distribution of Industries",
+>>>>>>> Stashed changes
         fontsize.title = 16,  # Adjust title font size
         fontsize.labels = 12, # Adjust labels font size
         fontsize.legend = 10, # Adjust legend font size
