@@ -31,7 +31,7 @@ library(plotly)
 AIThreat_order <- c('No', 'Unsure', 'Yes')
 selected$AIThreat <- factor(selected$AIThreat, levels = AIThreat_order, ordered = TRUE)
 
-AISent_order <- c('Unsure', 'Very unfavorable', 'Unfavorable', 'Indifferent', 'Favorable', 'Very favorable')
+AISent_order <- c('Very unfavorable', 'Unfavorable', 'Unsure', 'Indifferent', 'Favorable', 'Very favorable')
 selected$AISent <- factor(selected$AISent, levels = AISent_order, ordered = TRUE)
 
 AIComplex_order <- c('Very poor at handling complex tasks', 'Bad at handling complex tasks', 'Neither good or bad at handling complex tasks', 'Good, but not great at handling complex tasks', 'Very well at handling complex tasks')
@@ -72,6 +72,57 @@ ggplot(alluvial_data,
 ggplotly(p)
 ```
 ```{r}
+distribution <- selected |>
+  filter(!is.na(AIThreat) & !is.na(Industry)) |>
+  group_by(Industry, AIThreat) |>
+  summarize(Count = n()) |>
+  ungroup() |>
+  group_by(Industry) |>
+  mutate(Percent = Count / sum(Count) * 100) |>
+  ungroup()
+
+ggplot(distribution, aes(x = reorder(Industry, -Percent), y = Percent, fill = AIThreat)) +
+  geom_bar(stat = "identity") +
+  labs(
+    title = "Distribution of AI Threat by Industry",
+    x = "Industry",
+    y = "Percentage",
+    fill = "AI Threat"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1)
+  )
+```
+```{r}
+# | fig-width: 15
+# | fig-width: 10
+
+SOVisitFreq_order <- c('Less than once per month or monthly', 'A few times per month or weekly', 'A few times per week', 'Daily or almost daily', 'Multiple times per day')
+selected$SOVisitFreq <- factor(selected$SOVisitFreq, levels = SOVisitFreq_order, ordered = TRUE)
+
+SOPartFreq_order <- c('I have never participated in Q&A on Stack Overflow', 'Less than once per month or monthly', 'A few times per month or weekly', 'A few times per week', 'Daily or almost daily', 'Multiple times per day')
+selected$SOPartFreq <- factor(selected$SOPartFreq, levels = SOPartFreq_order, ordered = TRUE)
+
+
+filtered <- selected |> 
+  filter(!is.na(SOVisitFreq) & !is.na(SOPartFreq))
+
+filtered
+ggplot(filtered, aes(x = SOVisitFreq, y = SOPartFreq)) +
+  geom_jitter(alpha=0.04) +
+  labs(
+    x = "Stack Overflow Visits",
+    y = "Stack Overflow Participation"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1)
+  )
+```
+
+
+```{r}
 library(forcats)
 
 # Reorder DevType and place NA at the bottom
@@ -104,7 +155,7 @@ filtered_data <- selected |>
 
 contingency_table <- table(filtered_data$SOVisitFreq, filtered_data$AISelect)
 
-mosaicplot(contingency_table, color=TRUE, shade=TRUE, las = 1)
+mosaicplot(contingency_table, color=TRUE, shade=TRUE, las = 1, main='Relationship between using SO and using AI')
 ```
 
 ```{r}
@@ -139,34 +190,13 @@ AI <- subset(AI_survey, select = -X)
 data_long <- AI %>%
   pivot_longer(cols = -index, names_to = "category", values_to = "value")
 
-ggplot(data_long, aes(x = index, y = value, fill = category)) +
-    geom_bar(stat = "identity", position = "fill") +  # Use "fill" for proportions
-  labs(x = "Activity", y = "Count", title = "Which parts of your development workflow are you currently using AI tools for\nand which are you interested in using AI tools for over the next year?") +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
-
-
 ggplot(data_long, aes(x = index, y = category, fill = value)) +
   geom_tile() +
   scale_fill_viridis(option = "C") +  # Color scale
-  labs(x = "Activity", y = "Category", title = "Heatmap of Interest in Development Activities") +
+  labs(x = "Development Workflow", y = "AI integration interest", title = "Interest in Integrating AI into Development Activities") +
+  scale_y_discrete(labels = c("Currently.Using" = "Currently using", "Interested.in.Using" = "Interested in using", "Not.interested.in.Using" = "Not interested in using")) +  # Relabel y-axis
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
-ggplot(data_long, aes(x = index, y = value, color = category)) +
-  geom_point(position = position_jitter(width = 0.1, height = 0), size = 3) +
-  labs(x = "Activity", y = "Count", title = "Dot Plot of Interest in Development Activities") +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-  scale_color_manual(values = c("Currently_Using" = "blue", 
-                               "Interested_in_Using" = "orange", 
-                               "Not_interested_in_Using" = "gray"))
-
-plot_ly(data_long, x = ~index, y = ~value, color = ~category, type = 'bar', 
-        text = ~paste("Count: ", value), hoverinfo = 'text') %>%
-  layout(
-    title = "Interest in Different Development Activities",
-    xaxis = list(title = "Activity"),
-    yaxis = list(title = "Count"),
-    barmode = "dodge"
-  )
 ```
 
 ```{r}
@@ -178,24 +208,7 @@ ggplot(selected, aes(x = AISelect, y = Age)) +
        y = "Age")
 ```
 
-```{r}
-# Load necessary libraries
-library(ggplot2)
-
-df_summary <- as.data.frame(table(selected$AISelect, selected$Age))
-
-ggplot(df_summary, aes(x = Var1, y = Var2, fill=)) +
-  geom_tile() +
-  scale_fill_viridis_c() +  # Use a color scale to show density
-  theme_minimal() +
-  labs(title = "Heatmap of Counts for AISelect and Age",
-       x = "AISelect",
-       y = "Age") +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
-
-```
 ```{r fig.width= 10}
-
 
 ggplot(selected, aes(x = DevType, fill = RemoteWork)) +
   geom_bar(position = "fill") +
@@ -211,9 +224,6 @@ ggplot(selected %>% filter(!is.na(RemoteWork)), aes(x = as.factor(AISelect), y =
        title = "AI Tool Usage vs Job Satisfaction by Age") +
   facet_wrap(~ Age) +  # Facet by RemoteWork status
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
-
-
-
 ```
 
 ```{r}
@@ -407,6 +417,20 @@ ggplot(merged_data, aes(x = long, y = lat, group = group, fill = ProportionThrea
   labs(title = "Proportion of People Who Think AI is a Threat by Country")  # Add title
 
 ```
+
+
+
+```{r fig.width=10}
+ai_next <- read.csv('data/ai_next.csv')
+
+likert(index ~ .,data=ai_next, ylab=NULL, ReferenceZero=3,
+  as.percent=TRUE,
+  main = list("Future AI integration into workflow",x=unit(.55, "npc")),
+  strip=FALSE,
+   par.strip.text=list(cex=.7))
+
+```
+
 ```{r fig.height=10}
 library(ggplot2)
 
@@ -468,6 +492,4 @@ treemap(education_counts_df,
 )
 
 ```
-
-
 
