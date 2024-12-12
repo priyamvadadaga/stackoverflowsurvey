@@ -403,4 +403,15 @@ treemap(industry_counts_df,
 )
 
 ```
+```{r fig.height=10}
+ggplot(selected, aes(x = Age)) +
+  geom_bar(fill='lightblue') +
+  facet_wrap(~ MainBranch) +
+  theme_minimal() +
+  labs(title = "Distribution of Age by Main Branch",
+       x = "Age",
+       y = "Count")+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
 
