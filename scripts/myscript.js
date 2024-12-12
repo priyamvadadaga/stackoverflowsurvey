@@ -1,5 +1,6 @@
 // add your JavaScript/D3 to this file
 // Load the CSV file
+
 d3.csv("data/industry_summary.csv").then(function (data) {
   // Parse the data
   data.forEach(d => {
