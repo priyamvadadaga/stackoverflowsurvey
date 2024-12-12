@@ -1,4 +1,8 @@
 # Interactive graph
+
+As the final plot, we were interested in exploring whether the kind of development undertaken impacts the sense of being part of StackOverflow community. We proposed earlier our belief that community development is crucial to advancements and growth both at the individual and societal level. To examine this, and additionally, to get a sense of the kinds of programmers that find StackOverflow posts useful, we create a plot that allows one to visualize by development type. 
+
+### Sense of Community at StackOverflow {-}
 <style>
   * {
     font-family: Arial, sans-serif;
@@ -83,3 +87,6 @@
 <!-- Include D3.js library and the external JavaScript file -->
 <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
 <script src="scripts/myscript.js"></script>
+
+
+We observe that the general pattern is a positive skew, with most people holding the sentiment 'No, not really'. Certain segments, however, have a stronger sense of community, including Mobile Developers, Scientists, those in R&D roles, Product Managers, and AI developers. It seems that typically, the roles that we previously flagged as more entry- to mid-level have a higher sense of community since they likely engage in day-to-day development work and are active users.
