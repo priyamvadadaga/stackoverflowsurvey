@@ -319,7 +319,7 @@ ggplot(data = world_data) +
 
 Lighter regions across the map highlight higher AI usage, include parts of Asia, Europe, and North America. We see that developed nations with robust technologies have typically adopted AI practices, with over 50% respondents already using AI. Interestingly, these stats are even higher for many developing countries across Asia including Mongolia, China, India. We finally want to check what determines this flow of AI sentiments. 
 
-### Alluvial Diagram
+### AI -- good, bad, ugly?
 
 ```{r, warning=FALSE, message=FALSE}
 AIThreat_order <- c('No', 'Unsure', 'Yes')
@@ -366,4 +366,6 @@ ggplot(alluvial_data,
 p
 ```
 
-Across the four parameters that measure users' perspectives on AI, we observe that although typically polarized views are "sticky", in the sense that those hold strong positive views or strong negative views hold these across their beliefs in accuracy, their sentiment, 
+Across the four parameters that measure users' perspectives on AI, we observe that although typically polarized views are "sticky", in the sense that those hold strong positive views or strong negative views hold these across their beliefs in the AI's accuracy, its ability to handle complex tasks, and their general sentiment. Individuals expressing neutral opinions, such as "Neither good nor bad at handling complex tasks," often demonstrate variability in their sentiment and trust levels, transitioning between indifference and moderate trust. A very small proportion of users identify AI as a significant threat. Among these, distrust is more common, aligning with unfavorable sentiment and poor ratings for AI’s ability to handle complexity. Those who view AI as capable of managing complex tasks generally align with higher levels of trust and favorable sentiment. These individuals rarely perceive AI as a threat.
+
+The dispersed structure of the alluvial diagram mirrors the current general sentiment toward AI, where opinions are multifaceted rather than a single consensus. We can gauge a sense of anticipation even in StackOverflow users, who are presumably more informed about AI than those in other domains. We expect that in future years, as the impacts of AI become clearer, the plot will paint a clearer picture.

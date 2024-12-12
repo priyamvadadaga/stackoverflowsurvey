@@ -1,13 +1,10 @@
 # Introduction
-Before OpenAI and other LLMs were built, StackOverflow was the go-to source for developers to have their questions answered. In May 2024 over 65,000 developers responded to Stack Overflow's annual survey about coding, working, AI and how they feel about the industry. 
-This data can provide valuable insights into the current state of the tech industry. As individuals who work in tech or aim to work in tech, understanding these trends is both interesting and essential These insights are crucial for understanding how the industry is evolving and how developers feel about the tools, skills, and environments shaping their work. 
+Before OpenAI and other LLMs were built, StackOverflow was the go-to source for developers to have their questions answered. In May 2024 over 65,000 developers responded to Stack Overflow's annual survey about coding, working, AI and how they feel about the industry. This data can provide valuable insights into the current state of the tech industry. As individuals who work in tech or aim to work in tech, understanding these trends is both interesting and essential These insights are crucial for understanding how the industry is evolving and how developers feel about the tools, skills, and environments shaping their work. 
 
-Questions we're interested in:
+Questions we explore:
 
 1. Demographics of respondents: to understand the landscape of users StackOverflow caters to
 
-2. Perspectives on AI: to understand developers' views on AI in the workplace, especially in the world of generative AI as a threat to certain jobs
+2. StackOverflow usage: with the advent of GPT, Claude and other LLM's, how developers' perspectives on more "traditional" sources like StackOverflow are changing and whether it still adequately meets their needs
 
-3. StackOverflow usage: With the advent of GPT, LLama and other LLM's, how developers' perspectives on more "traditional" sources like StackOverflow are changing and whether it still adequately meets their needs.
-
-(As we explore the data further and discover patterns, we will refine and update our research questions.)
+3. Perspectives on AI: to understand developers' views on AI in the workplace, especially in the context of generative AI being posed as a threat to jobs

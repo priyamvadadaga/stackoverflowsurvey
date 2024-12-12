@@ -106,3 +106,7 @@ ggplot(missing_values, aes(x = question, y = missing_proportion)) +
 We notice, as a general pattern, that the missing values have a somewhat upward trend as users progressed in the survey. As expected, the highest likelihood of missing values is when the last question is unanswered. Interestingly, those that thought the survey was "Too Short" had a higher proportion of missing values compared to those that thought it was "Too long". Although somewhat counter intuitive, perhaps it is the fatigue from actually answering the questions that results in answering "Too long", while not answering leads to believing it was too short. 
 
 We additionally look at data on whether the question is a required question. We notice that certain non-required questions also have very few missing values, indicating user keenness on answering these questions, such as their current development type (i.e. job) and questions regarding their experience with Stack Overflow. We also notice how even certain required questions have high missing values, which perhaps indicates a systemic flaw. We are considering dropping the rows where a required question was not answered, since this likely indicates an incomplete survey that was wrongly submitted.
+
+## Preprocessing
+
+Certain variables in the dataset appeared as semi-colon separated lists which were parsed in python via `preprocess.ipynb`. Typically, this was to get the counts in a wide format. 
