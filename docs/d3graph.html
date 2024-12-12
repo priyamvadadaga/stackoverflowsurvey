@@ -170,7 +170,80 @@ ul.task-list li input[type="checkbox"] {
 
 
 <style>
-  * { font-family: sans-serif; }
+  * {
+    font-family: Arial, sans-serif;
+  }
+
+  .tabs {
+    display: flex;
+    flex-wrap: wrap; /* Ensure the buttons fit in one row and wrap if needed */
+    margin-bottom: 20px;
+    gap: 5px; /* Add spacing between buttons */
+  }
+
+  .tabs button {
+    background-color: #f5f5f5;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 5px 10px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+
+  .tabs button:hover {
+    background-color: #e0e0e0;
+  }
+
+  .tabs button.active {
+    background-color: #007bff;
+    color: white;
+    border-color: #0056b3;
+  }
+
+  .chart-container {
+    display: none; /* Hide all charts by default */
+  }
+
+  .chart-container.active {
+    display: block; /* Show only active chart */
+  }
+
+  .axis text {
+    font-size: 10px;
+    fill: #333;
+  }
+
+  .axis path,
+  .axis line {
+    stroke: #ccc;
+  }
+
+  .axis-label {
+    font-size: 12px;
+    fill: #555;
+    font-weight: bold;
+  }
+
+  .bar {
+    fill: #007bff;
+    transition: fill 0.2s ease, height 0.2s ease;
+  }
+
+  .bar:hover {
+    fill: #0056b3;
+  }
+
+  .tooltip {
+    position: absolute;
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 5px 10px;
+    font-size: 12px;
+    pointer-events: none;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+  }
 </style>
 <div id="tabs" class="tabs">
 
