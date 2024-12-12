@@ -1,25 +1,25 @@
 document.addEventListener("DOMContentLoaded", function() {
   d3.json("https://raw.githubusercontent.com/priyamvadadaga/stackoverflowsurvey/refs/heads/main/data/selected.json").then(function(data) {
-    // Replace any null or NA values in AIAcc with the string "NA"
+    // Replace any null or NA values in SOComm with the string "NA"
     data.forEach((d) => {
-      if (d.AIAcc == null || d.AIAcc === "NA") {
-        d.AIAcc = "NA";
+      if (d.SOComm == null || d.SOComm === "NA") {
+        d.SOComm = "NA";
       }
     });
 
-    // Define a consistent order for AIAcc levels
-    const aiAccOrder = ["Highly distrust", "Somewhat distrust", "Neither trust nor distrust", "Somewhat trust", "Highly trust", "NA"];
+    // Define a consistent order for SOComm levels
+    const aiAccOrder = ['No, not at all', 'No, not really', 'Neutral', 'Yes, somewhat', 'Yes, definitely', 'Not sure'];
     
-    const filteredData = data.filter((d) => d.Industry && d.Industry !== "NA");
+    const filteredData = data.filter((d) => d.DevType && d.DevType !== "NA");
 
     // Extract unique MainBranch categories
-    const mainBranches = [...new Set(filteredData.map((d) => d.Industry))].sort();
+    const mainBranches = [...new Set(filteredData.map((d) => d.DevType))].sort();
 
     // Compute the global maximum count across all MainBranch categories
     const globalMaxCount = d3.max(
       mainBranches.map((branch) => {
-        const filteredData = data.filter((d) => d.Industry === branch);
-        const aiAccCounts = d3.rollup(filteredData, (v) => v.length, (d) => d.AIAcc);
+        const filteredData = data.filter((d) => d.DevType === branch);
+        const aiAccCounts = d3.rollup(filteredData, (v) => v.length, (d) => d.SOComm);
         return d3.max(aiAccOrder.map((label) => aiAccCounts.get(label) || 0));
       })
     );
@@ -60,18 +60,18 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // For each MainBranch, filter data and create a chart container
     mainBranches.forEach((branch) => {
-      const filteredData = data.filter((d) => d.Industry === branch);
+      const filteredData = data.filter((d) => d.DevType === branch);
 
-      // Count occurrences of each AIAcc level
+      // Count occurrences of each SOComm level
       const aiAccCounts = d3.rollup(
         filteredData,
         (v) => v.length,
-        (d) => d.AIAcc
+        (d) => d.SOComm
       );
 
-      // Ensure all AIAcc levels are included in the counts, even if zero
+      // Ensure all SOComm levels are included in the counts, even if zero
       const aiAccArray = aiAccOrder.map((label) => ({
-        AIAcc: label,
+        SOComm: label,
         count: aiAccCounts.get(label) || 0,
       }));
       
@@ -91,7 +91,7 @@ document.addEventListener("DOMContentLoaded", function() {
         .append("g")
         .attr("transform", `translate(${margin.left},${margin.top})`);
 
-      // x-scale with consistent AIAcc order
+      // x-scale with consistent SOComm order
       const x = d3
         .scaleBand()
         .domain(aiAccOrder)
@@ -111,13 +111,13 @@ document.addEventListener("DOMContentLoaded", function() {
         .data(aiAccArray)
         .join("rect")
         .attr("class", "bar")
-        .attr("x", (d) => x(d.AIAcc))
+        .attr("x", (d) => x(d.SOComm))
         .attr("y", (d) => y(d.count))
         .attr("width", x.bandwidth())
         .attr("height", (d) => height - y(d.count))
         .on("mouseover", function (event, d) {
           tooltip.transition().duration(200).style("opacity", 1);
-          tooltip.html(`AIAcc: ${d.AIAcc}<br>Count: ${d.count}`)
+          tooltip.html(`Part of Community: ${d.SOComm}<br>Count: ${d.count}`)
             .style("left", (event.pageX + 10) + "px")
             .style("top", (event.pageY - 20) + "px");
         })
@@ -158,7 +158,7 @@ document.addEventListener("DOMContentLoaded", function() {
         .attr("x", width / 2)
         .attr("y", height + margin.bottom - 15)
         .attr("text-anchor", "middle")
-        .text("AIAcc");
+        .text("Do you consider yourself a member of the Stack Overflow community?");
 
       // Add y-axis label
       svg
