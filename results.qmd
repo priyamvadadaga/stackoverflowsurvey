@@ -16,6 +16,7 @@ library(rnaturalearth)
 library(rnaturalearthdata)
 library(treemap)
 library(scales)
+library(jsonlite)
 ```
 
 ## Demographics
@@ -27,6 +28,7 @@ keep <- c('MainBranch', 'Age', 'RemoteWork', 'Check', 'EdLevel', 'YearsCode', 'Y
 selected <- survey |> dplyr::select(all_of(keep))
 selected <- selected |>
   mutate(across(c('MainBranch', 'Age', 'RemoteWork', 'Check', 'EdLevel', 'DevType', 'SOVisitFreq', 'SOAccount', 'SOPartFreq', 'SOComm', 'AISelect', 'AISent', 'AIAcc', 'AIComplex', 'AIThreat', 'ICorPM', 'Knowledge_1', 'Knowledge_2', 'Knowledge_3', 'Knowledge_4', 'Knowledge_5', 'Knowledge_6', 'Knowledge_7', 'Knowledge_8', 'Knowledge_9', 'TimeSearching', 'TimeAnswering', 'ProfessionalCloud', 'ProfessionalQuestion', 'JobSat', 'SurveyLength', 'SurveyEase'), as.factor))
+write_json(selected, "data/selected.json")
 ```
 
 
