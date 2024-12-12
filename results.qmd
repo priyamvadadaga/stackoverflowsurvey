@@ -81,6 +81,141 @@ Sectors like Government and Media & Advertising Services have smaller representa
 languages <- read.csv('data/languages.csv')
 ggplot(languages, aes(x = reorder(index, -Language), y=Language)) +
   geom_col(fill='lightblue') +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))+
+  labs(x = "Language", y = "Count",title = "Most common languages used")
+```
+The plot shows that mostly Javascript and HTML are the languages most used by respondents
+of the survey, indicating that majority of the respondents are in the web 
+development field. This is then followed by other common softwares like Python,
+SQL, Typescript, Java, C++ and more. There is a noticeable drop in usage after the top three languages.
+Many languages on the right tail have significantly lower counts, indicating specialized applications.
+
+
+### Age v/s Coding Practice
+```{r fig.height=8}
+ggplot(selected, aes(x = Age)) +
+  geom_bar(fill='lightblue') +
+  facet_wrap(~ MainBranch) +
+  labs(title = "Distribution of Age by Main Branch",
+       x = "Age",
+       y = "Count")+
+  theme(axis.text.x = element_text(angle = 90, hjust = 1),
+        strip.text = element_text(size = 8, hjust = 0, vjust = 0.5, lineheight = 1.2))
+```
+Majority of respondents are professional developers, with a right-skew, as most developers fall within the 18-44 age range, with the modal range being 25-34 years. This indicates a strong presence of younger professionals in the tech industry, likely driven by increasing demand for tech skills across industries. Those who code primarily as a hobby or are learning to code represent significantly smaller proportions of the total respondents. Interestingly, their distribution skews heavily toward the 18-24 age group, reflecting a pipeline of aspiring developers or those exploring programming as part of their education or career. On the other hand, respondents who occasionally code as part of their work or studies show a broader age distribution, indicating coding's growing utility as a secondary skill in non-tech professions. Former professional developers are a small segment and predominantly fall in older age brackets, likely indicating transitions to managerial or non-coding roles.
+
+### Average Years of Coding Experience by Development Type
+```{r, warning=FALSE, message=FALSE}
+avg_years_code_pro <- selected %>%
+  group_by(DevType) %>%
+  summarize(avg_years_code_pro = mean(as.numeric(YearsCodePro), na.rm = TRUE))
+
+avg_years_code_pro <- avg_years_code_pro %>%
+  mutate(DevType = fct_explicit_na(DevType, na_level = "NA")) %>%
+  mutate(DevType = fct_rev(DevType))  # Reverse factor levels
+
+ggplot(avg_years_code_pro, aes(x = avg_years_code_pro, y = reorder(DevType, avg_years_code_pro))) +
+  geom_point(color = "skyblue", size = 2) +  # Use points instead of bars
+  labs(x = "Average Years of Professional Coding", y = "Developer Type", 
+       title = "Avg. Years of Professional Coding by Developer Type") +
+  theme_minimal() +  # Cleaner theme
+  theme(axis.text.y = element_text(size = 8),  # Adjust y-axis text size
+        axis.title = element_text(size = 10))  # Adjust axis title size
+
+```
+This graph represents the suspected -- those with most years of professional coding experience hold higher positions like C-Suite, Managers, Product Managers (exceeding 15 years in coding) whereas those with fewer years of coding experience tend to be Students and more entry-level roles such as Developers and Data Analysts. We see that those with lowest average experience levels are students or entry-level professionals, and with progression, the roles become more specialized, indicating the natural tendency to specialize over one's career. Interestingly, however, certain specialized roles like Blockchain Developers require relatively less experience, suggesting the quick growth of these newer fields. Another interesting observation is the fairly high experience among Marketing or Sales professionals, which may be attributed to the advent of digital marketing and leveraging code to analyze market trends. With a wide range of the average coding experience, it would be interesting to observe sentiment regarding both StackOverflow and AI as aids to coding.
+
+
+### Remote Work Behavior by Development Type
+```{r fig.width= 10}
+RemoteWork_order  <-  c('Remote', 'Hybrid (some remote, some in-person)', 'In-person')
+selected$RemoteWork <- factor(selected$RemoteWork, levels = RemoteWork_order, ordered = TRUE)
+
+filtered <- selected |>
+  filter(!is.na(DevType) & !is.na(RemoteWork))
+
+ggplot(filtered, aes(x = DevType, fill = RemoteWork)) +
+  geom_bar(position = "fill") +
+  scale_fill_brewer(palette = "Blues") +
+  labs(x = "Developer Type", y = "Proportion of Remote Work", 
+       title = "Proportion of Remote Work by Developer Type") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, hjust=1, vjust=-0.01))
+
+```
+Few roles require in-person presence, including Hardware Engineers, Embedded Aplplications Developers and of course Educators and Students. Certain other roles are extremely open to Remote work, including Blockchain developers, Developer Advocates, and Game & Graphics Developers. Across roles, there is a significant proportion of hybrid employees, which is a common post-Covid development. Given these distributions, we explore questions regarding AI usage, and whether remote work tends to create more positive sentiment and adoption.
+
+## StackOverflow Usage
+
+StackOverflow is driven primarily through user contributions. It has been the go-to for development-related knowledge-sharing, where active participation is essential. From posting questions to answering queries to voting on content, user participation drives the platform's benefits and success. We begin by analyzing the relationship between StackOverflow visits and participation to get insights into user engagement and community dynamics. 
+
+### Visits versus Participation
+
+```{r}
+library(ggplot2)
+library(ggalluvial)
+library(dplyr)
+library(plotly)
+
+AIThreat_order <- c('No', 'Unsure', 'Yes')
+selected$AIThreat <- factor(selected$AIThreat, levels = AIThreat_order, ordered = TRUE)
+
+AISent_order <- c('Very unfavorable', 'Unfavorable', 'Unsure', 'Indifferent', 'Favorable', 'Very favorable')
+selected$AISent <- factor(selected$AISent, levels = AISent_order, ordered = TRUE)
+
+AIComplex_order <- c('Very poor at handling complex tasks', 'Bad at handling complex tasks', 'Neither good or bad at handling complex tasks', 'Good, but not great at handling complex tasks', 'Very well at handling complex tasks')
+selected$AIComplex <- factor(selected$AIComplex, levels = AIComplex_order, ordered = TRUE)
+
+
+### Eduction
+The survey data covers Stack Overflow users across varying education levels. The distribution of highest level of education obtained is plotted below.
+```{r fig.height=10}
+selected$EdLevel <- factor(selected$EdLevel, 
+                           levels = c("Primary/elementary school", 
+                                      "Secondary school (e.g. American high school, German Realschule or Gymnasium, etc.)",
+                                      "Some college/university study without earning a degree",
+                                      "Associate degree (A.A., A.S., etc.)",
+                                      "Bachelor’s degree (B.A., B.S., B.Eng., etc.)",
+                                      "Master’s degree (M.A., M.S., M.Eng., MBA, etc.)",
+                                      "Professional degree (JD, MD, Ph.D, Ed.D, etc.)",
+                                      "Something else"))
+
+ggplot(selected, aes(x = EdLevel)) +
+  geom_bar(fill = "skyblue", color = "black", size=0.1) +
+  labs(
+    title = "Distribution of Highest Level of Formal Education",
+    x = "Education Level",
+    y = "Count"
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+The data highlights that StackOverflow caters primarily to a highly educated audience, with over 40,000 individuals holding advanced degrees. However, the presence of nearly 16,000 respondents with lower levels of formal education and more unconventional paths demonstrates that the platform still attracts a diverse range of learners and practitioners. This diversity showcases the platform's appeal not only as a resource for trained developers but also for self-taught individuals and those transitioning from non-traditional educational backgrounds. Given this distribution, education may be a key variable in distinguishing between groups of opinions on AI.
+
+### Industry
+```{r}
+industry_counts_df <- as.data.frame(table(selected$Industry))
+industry_counts_df <- industry_counts_df[order(-industry_counts_df$Freq), ]
+
+treemap(industry_counts_df,
+        index = "Var1",         # Category variable
+        vColor = "Freq", 
+        vSize = "Freq",  
+        palette = 'Blues',
+        draw = TRUE,
+        title = "Distribution of Industries of Respondents",
+        border.col = "white"
+)
+```
+Most survey respondents were in the Software Development industry. Fintech as well as Internet, Telecomm or Information Services are also prominent, reflecting the growing importance of digital financial services and communication technologies. Banking/Financial Services, Healthcare, Manufacturing, and Retail and Consumer Services are moderately sized.
+Sectors like Government and Media & Advertising Services have smaller representations, suggesting either niche markets or less emphasis compared to larger sectors. Higher Education, Transportation, or Supply Chain, and Computer Systems Design Services are similarly sized. The inclusion of traditionally non-tech industries like Healthcare, Government, and Retail shows that technology professionals are present across diverse fields. The dominance of tech industries is expected given the focus on StackOverflow, but it is interesting to observe the growing presence of coding-based methods in sectors such like Energy.
+
+### Languages
+```{r}
+languages <- read.csv('data/languages.csv')
+ggplot(languages, aes(x = reorder(index, -Language), y=Language)) +
+  geom_col(fill='lightblue') +
   theme(axis.text.x = element_text(angle = 90, hjust = 1))
 ```
 TODO: add description
