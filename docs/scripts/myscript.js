@@ -9,14 +9,16 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // Define a consistent order for AIAcc levels
     const aiAccOrder = ["Highly distrust", "Somewhat distrust", "Neither trust nor distrust", "Somewhat trust", "Highly trust", "NA"];
+    
+    const filteredData = data.filter((d) => d.Industry && d.Industry !== "NA");
 
     // Extract unique MainBranch categories
-    const mainBranches = [...new Set(data.map((d) => d.MainBranch))].sort();
+    const mainBranches = [...new Set(filteredData.map((d) => d.Industry))].sort();
 
     // Compute the global maximum count across all MainBranch categories
     const globalMaxCount = d3.max(
       mainBranches.map((branch) => {
-        const filteredData = data.filter((d) => d.MainBranch === branch);
+        const filteredData = data.filter((d) => d.Industry === branch);
         const aiAccCounts = d3.rollup(filteredData, (v) => v.length, (d) => d.AIAcc);
         return d3.max(aiAccOrder.map((label) => aiAccCounts.get(label) || 0));
       })
@@ -58,7 +60,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // For each MainBranch, filter data and create a chart container
     mainBranches.forEach((branch) => {
-      const filteredData = data.filter((d) => d.MainBranch === branch);
+      const filteredData = data.filter((d) => d.Industry === branch);
 
       // Count occurrences of each AIAcc level
       const aiAccCounts = d3.rollup(
@@ -72,6 +74,8 @@ document.addEventListener("DOMContentLoaded", function() {
         AIAcc: label,
         count: aiAccCounts.get(label) || 0,
       }));
+      
+      const dynamicMaxCount = d3.max(aiAccArray, (d) => d.count);
 
       // Create a container for the chart
       const chartId = `chart-${branch.replace(/\W+/g, "_")}`;
@@ -96,10 +100,10 @@ document.addEventListener("DOMContentLoaded", function() {
 
       // y-scale with global maximum count
       const y = d3
-        .scaleLinear()
-        .domain([0, globalMaxCount])
-        .nice()
-        .range([height, 0]);
+          .scaleLinear()
+          .domain([0, dynamicMaxCount])
+          .nice()
+          .range([height, 0]);
 
       // Draw bars
       svg
@@ -128,10 +132,21 @@ document.addEventListener("DOMContentLoaded", function() {
         .attr("transform", `translate(0,${height})`)
         .call(d3.axisBottom(x))
         .selectAll("text")
-        .style("text-anchor", "end")
-        .attr("dx", "-0.5em")
-        .attr("dy", "0.15em")
-        .attr("transform", "rotate(-40)");
+        .style("text-anchor", "middle")
+        .attr("dy", "1em") // Adjust vertical alignment
+        .each(function (d) {
+          // Split the text into multiple lines if necessary
+          const words = d.split(/\s+/); // Split by spaces
+          const text = d3.select(this);
+          text.text(null); // Clear existing text
+          words.forEach((word, i) => {
+            text
+              .append("tspan")
+              .text(word)
+              .attr("x", 0)
+              .attr("dy", i === 0 ? "0em" : "1em"); // First line starts at 0em, subsequent lines shift down
+          });
+        });
 
       // Add y-axis
       svg.append("g").attr("class", "axis").call(d3.axisLeft(y));
