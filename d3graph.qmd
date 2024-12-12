@@ -1,22 +1,92 @@
 # Interactive graph
 
+As the final plot, we were interested in exploring whether the kind of development undertaken impacts the sense of being part of StackOverflow community. We proposed earlier our belief that community development is crucial to advancements and growth both at the individual and societal level. To examine this, and additionally, to get a sense of the kinds of programmers that find StackOverflow posts useful, we create a plot that allows one to visualize by development type. 
+
+### Sense of Community at StackOverflow {-}
 <style>
   * {
-    font-family: sans-serif;
+    font-family: Arial, sans-serif;
   }
-  .bar {
-    fill: steelblue;
+
+  .tabs {
+    display: flex;
+    flex-wrap: wrap; /* Ensure the buttons fit in one row and wrap if needed */
+    margin-bottom: 20px;
+    gap: 5px; /* Add spacing between buttons */
   }
-  .bar:hover {
-    fill: orange;
+
+  .tabs button {
+    background-color: #f5f5f5;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 5px 10px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
   }
+
+  .tabs button:hover {
+    background-color: #e0e0e0;
+  }
+
+  .tabs button.active {
+    background-color: #007bff;
+    color: white;
+    border-color: #0056b3;
+  }
+
+  .chart-container {
+    display: none; /* Hide all charts by default */
+  }
+
+  .chart-container.active {
+    display: block; /* Show only active chart */
+  }
+
+  .axis text {
+    font-size: 10px;
+    fill: #333;
+  }
+
+  .axis path,
+  .axis line {
+    stroke: #ccc;
+  }
+
   .axis-label {
-    font-size: 14px;
+    font-size: 12px;
+    fill: #555;
     font-weight: bold;
+  }
+
+  .bar {
+    fill: #007bff;
+    transition: fill 0.2s ease, height 0.2s ease;
+  }
+
+  .bar:hover {
+    fill: #0056b3;
+  }
+
+  .tooltip {
+    position: absolute;
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 5px 10px;
+    font-size: 12px;
+    pointer-events: none;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
   }
 </style>
 
-<div id="plot"></div>
+<div class="tabs" id="tabs"></div>
+<div id="plot">
+</div>
 
+<!-- Include D3.js library and the external JavaScript file -->
 <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
 <script src="scripts/myscript.js"></script>
+
+
+We observe that the general pattern is a positive skew, with most people holding the sentiment 'No, not really'. Certain segments, however, have a stronger sense of community, including Mobile Developers, Scientists, those in R&D roles, Product Managers, and AI developers. It seems that typically, the roles that we previously flagged as more entry- to mid-level have a higher sense of community since they likely engage in day-to-day development work and are active users.
