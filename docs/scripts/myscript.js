@@ -1,107 +1,163 @@
 document.addEventListener("DOMContentLoaded", function() {
-  d3.json("data/selected.json").then(function(data) {
-    // Extract unique MainBranch values
-    const mainBranches = [...new Set(data.map(d => d.MainBranch))];
+  d3.json("https://raw.githubusercontent.com/priyamvadadaga/stackoverflowsurvey/refs/heads/main/data/selected.json").then(function(data) {
+    // Replace any null or NA values in AIAcc with the string "NA"
+    data.forEach((d) => {
+      if (d.AIAcc == null || d.AIAcc === "NA") {
+        d.AIAcc = "NA";
+      }
+    });
 
-    // Create a tab button for each main branch
+    // Define a consistent order for AIAcc levels
+    const aiAccOrder = ["Highly distrust", "Somewhat distrust", "Neither trust nor distrust", "Somewhat trust", "Highly trust", "NA"];
+
+    // Extract unique MainBranch categories
+    const mainBranches = [...new Set(data.map((d) => d.MainBranch))].sort();
+
+    // Compute the global maximum count across all MainBranch categories
+    const globalMaxCount = d3.max(
+      mainBranches.map((branch) => {
+        const filteredData = data.filter((d) => d.MainBranch === branch);
+        const aiAccCounts = d3.rollup(filteredData, (v) => v.length, (d) => d.AIAcc);
+        return d3.max(aiAccOrder.map((label) => aiAccCounts.get(label) || 0));
+      })
+    );
+
+    // Create tab buttons
     const tabsDiv = d3.select("#tabs");
     mainBranches.forEach((branch, i) => {
-      tabsDiv.append("button")
+      tabsDiv
+        .append("button")
         .text(branch)
         .attr("data-branch", branch)
-        .on("click", function() {
-          // On click, highlight this tab and show corresponding chart
+        .on("click", function () {
+          // Highlight the active tab
           d3.selectAll("#tabs button").classed("active", false);
           d3.select(this).classed("active", true);
 
-          // Show only the chart corresponding to this branch
+          // Hide all chart containers and show the selected one
           d3.selectAll(".chart-container").classed("active", false);
-          d3.select(`#chart-${branch}`).classed("active", true);
+          d3.select(`#chart-${branch.replace(/\W+/g, "_")}`).classed("active", true);
         });
     });
 
-    // Initially activate the first tab
+    // Activate the first tab by default
     d3.select("#tabs button").classed("active", true);
 
     const plotDiv = d3.select("#plot");
 
-    // For each main branch, filter data and create a chart container
-    mainBranches.forEach((branch, i) => {
-      const filteredData = data.filter(d => d.MainBranch === branch);
+    // Dimensions for the chart
+    const margin = { top: 20, right: 20, bottom: 60, left: 60 };
+    const width = 600 - margin.left - margin.right;
+    const height = 400 - margin.top - margin.bottom;
+
+    // Tooltip setup
+    const tooltip = d3.select("body")
+      .append("div")
+      .attr("class", "tooltip")
+      .style("opacity", 0);
+
+    // For each MainBranch, filter data and create a chart container
+    mainBranches.forEach((branch) => {
+      const filteredData = data.filter((d) => d.MainBranch === branch);
+
+      // Count occurrences of each AIAcc level
+      const aiAccCounts = d3.rollup(
+        filteredData,
+        (v) => v.length,
+        (d) => d.AIAcc
+      );
+
+      // Ensure all AIAcc levels are included in the counts, even if zero
+      const aiAccArray = aiAccOrder.map((label) => ({
+        AIAcc: label,
+        count: aiAccCounts.get(label) || 0,
+      }));
 
       // Create a container for the chart
-      const chartContainer = plotDiv.append("div")
+      const chartId = `chart-${branch.replace(/\W+/g, "_")}`;
+      const chartContainer = plotDiv
+        .append("div")
         .attr("class", "chart-container")
-        .attr("id", `chart-${branch}`);
+        .attr("id", chartId);
 
-      // We will create a simple bar chart of AIAcc values
-      // Assuming AIAcc is numeric. If it's a factor or categorical, 
-      // you may need to adapt the visualization.
-
-      // Set dimensions
-      const margin = {top: 20, right: 20, bottom: 30, left: 40};
-      const width = 500 - margin.left - margin.right;
-      const height = 300 - margin.top - margin.bottom;
-
-      const svg = chartContainer.append("svg")
+      const svg = chartContainer
+        .append("svg")
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom)
         .append("g")
         .attr("transform", `translate(${margin.left},${margin.top})`);
 
-      // x-scale for AIAcc (let's just treat them as numeric and plot a histogram-like bar chart)
-      const x = d3.scaleLinear()
-        .domain(d3.extent(filteredData, d => d.AIAcc))
-        .nice()
-        .range([0, width]);
+      // x-scale with consistent AIAcc order
+      const x = d3
+        .scaleBand()
+        .domain(aiAccOrder)
+        .range([0, width])
+        .padding(0.1);
 
-      // Let's create bins for a histogram
-      const bins = d3.bin()
-        .domain(x.domain())
-        .thresholds(10)(filteredData.map(d => d.AIAcc));
-
-      const y = d3.scaleLinear()
-        .domain([0, d3.max(bins, d => d.length)])
+      // y-scale with global maximum count
+      const y = d3
+        .scaleLinear()
+        .domain([0, globalMaxCount])
         .nice()
         .range([height, 0]);
 
-      // Append bars
-      svg.selectAll("rect")
-        .data(bins)
+      // Draw bars
+      svg
+        .selectAll("rect")
+        .data(aiAccArray)
         .join("rect")
-        .attr("x", d => x(d.x0))
-        .attr("y", d => y(d.length))
-        .attr("width", d => x(d.x1) - x(d.x0) - 1)
-        .attr("height", d => height - y(d.length))
-        .attr("fill", "steelblue");
+        .attr("class", "bar")
+        .attr("x", (d) => x(d.AIAcc))
+        .attr("y", (d) => y(d.count))
+        .attr("width", x.bandwidth())
+        .attr("height", (d) => height - y(d.count))
+        .on("mouseover", function (event, d) {
+          tooltip.transition().duration(200).style("opacity", 1);
+          tooltip.html(`AIAcc: ${d.AIAcc}<br>Count: ${d.count}`)
+            .style("left", (event.pageX + 10) + "px")
+            .style("top", (event.pageY - 20) + "px");
+        })
+        .on("mouseout", function () {
+          tooltip.transition().duration(200).style("opacity", 0);
+        });
 
       // Add x-axis
-      svg.append("g")
+      svg
+        .append("g")
         .attr("class", "axis")
         .attr("transform", `translate(0,${height})`)
-        .call(d3.axisBottom(x));
+        .call(d3.axisBottom(x))
+        .selectAll("text")
+        .style("text-anchor", "end")
+        .attr("dx", "-0.5em")
+        .attr("dy", "0.15em")
+        .attr("transform", "rotate(-40)");
 
       // Add y-axis
-      svg.append("g")
-        .attr("class", "axis")
-        .call(d3.axisLeft(y));
+      svg.append("g").attr("class", "axis").call(d3.axisLeft(y));
 
-      // Add axis labels
-      svg.append("text")
-        .attr("x", width/2)
-        .attr("y", height + margin.bottom - 5)
+      // Add x-axis label
+      svg
+        .append("text")
+        .attr("class", "axis-label")
+        .attr("x", width / 2)
+        .attr("y", height + margin.bottom - 15)
         .attr("text-anchor", "middle")
         .text("AIAcc");
 
-      svg.append("text")
+      // Add y-axis label
+      svg
+        .append("text")
+        .attr("class", "axis-label")
         .attr("transform", "rotate(-90)")
         .attr("y", -margin.left + 15)
-        .attr("x", -height/2)
+        .attr("x", -height / 2)
         .attr("text-anchor", "middle")
         .text("Count");
     });
 
-    // Activate the first chart by default
+    // Initially show only the first chart
+    d3.selectAll(".chart-container").classed("active", false);
     d3.select(".chart-container").classed("active", true);
   });
 });
