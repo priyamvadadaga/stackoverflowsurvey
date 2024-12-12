@@ -73,10 +73,6 @@ This dataset allows you to perform various analyses, including:
 
 The dataset is used to generate various visualizations and insights, such as identifying trends in developer roles, education levels, and industry distribution.
 
-### Data Source
+### Sources
 
-This dataset is based on the **Stack Overflow Developer Survey**, which is publicly available on [Stack Overflow Insights](https://insights.stackoverflow.com/survey).
-
-### File Formats
-
-The data is available in CSV format (`survey.csv`) and is processed using R for analysis and visualization.
+* Data: This dataset is based on the **Stack Overflow Developer Survey**, which is publicly available on [Stack Overflow Insights](https://insights.stackoverflow.com/survey).
