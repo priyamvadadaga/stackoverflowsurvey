@@ -1,11 +1,22 @@
 # Results
 
-## Demographics
-
 ```{r}
 library(tidyverse)
 library(dplyr)
+library(ggplot2)
+library(forcats)
+library(viridis)
+library(plotly)
+library(HH)
+library(ggalluvial)
+library(patchwork)
+library(RColorBrewer)
+library(maps)
+```
 
+## Demographics
+
+```{r}
 survey <- read.csv('data/survey_results_public.csv')
 schema <- read.csv('data/survey_results_schema.csv')
 keep <- c('MainBranch', 'Age', 'RemoteWork', 'Check', 'EdLevel', 'YearsCode', 'YearsCodePro', 'DevType', 'Country', 'ConvertedCompYearly', 'SOVisitFreq', 'SOAccount', 'SOPartFreq', 'SOComm', 'AISelect', 'AISent', 'AIAcc', 'AIComplex', 'AIThreat', 'ICorPM', 'WorkExp', 'Knowledge_1', 'Knowledge_2', 'Knowledge_3', 'Knowledge_4', 'Knowledge_5', 'Knowledge_6', 'Knowledge_7', 'Knowledge_8', 'Knowledge_9', 'TimeSearching', 'TimeAnswering', 'ProfessionalCloud', 'ProfessionalQuestion', 'Industry', 'JobSat', 'SurveyLength', 'SurveyEase')
@@ -18,9 +29,6 @@ selected <- selected |>
 ### Eduction
 The survey data covers Stack Overflow users across varying education levels. The distribution of highest level of education obtained is plotted below.
 ```{r fig.height=10}
-library(ggplot2)
-
-# Define the correct order of education levels
 selected$EdLevel <- factor(selected$EdLevel, 
                            levels = c("Primary/elementary school", 
                                       "Secondary school (e.g. American high school, German Realschule or Gymnasium, etc.)",
@@ -81,8 +89,6 @@ Majority of respondents are professional developers, with a right-skew, as most 
 
 ### Average Years of Coding Experience by Development Type
 ```{r}
-library(forcats)
-
 avg_years_code_pro <- selected %>%
   group_by(DevType) %>%
   summarize(avg_years_code_pro = mean(as.numeric(YearsCodePro), na.rm = TRUE))
@@ -105,7 +111,6 @@ This graph represents the suspected -- those with most years of professional cod
 
 ### Remote Work Behavior by Development Type
 ```{r fig.width= 10}
-
 RemoteWork_order  <-  c('Remote', 'Hybrid (some remote, some in-person)', 'In-person')
 selected$RemoteWork <- factor(selected$RemoteWork, levels = RemoteWork_order, ordered = TRUE)
 
@@ -173,9 +178,6 @@ We suspect that the advent of AI has led to certain changes in user behavior, in
 ### Interest in AI Integration
 
 ```{r}
-library(viridis)
-library(plotly)
-
 AI_survey <- read.csv('data/parsed_AItools.csv')
 AI <- subset(AI_survey, select = -X)
 
@@ -215,7 +217,6 @@ Continuing our previous exploration, we study the degrees to which there is inte
 
 ### (Future) AI in development workflows
 ```{r fig.width=10}
-library(HH)
 ai_next <- read.csv('data/ai_next.csv')
 
 likert(index ~ .,data=ai_next, ylab=NULL, ReferenceZero=3,
@@ -225,17 +226,82 @@ likert(index ~ .,data=ai_next, ylab=NULL, ReferenceZero=3,
   par.strip.text=list(cex=.7))
 
 ```
-We see that across the developemnt workflows, there is a strong positive sentiment to integrate AI in the future. This perhaps indicate the over
+We see that across the developement workflows, there is a strong positive sentiment to integrate AI in the future. Thus, the general sentiment across programmers is that adoption of AI across workflows likely to reduce redundant human work and boost productivity. There is a still a small portion, about 8-10% of survey takers, that still are unfavorable towards AI integration. We posit that perhaps this sentiment is a result of age and thereby comfort with "new" technology. To analyze this, we observe the behavior across age groups in already using AI tools.
+
+### Is age just a number?
+
+```{r fig.width=12, fig.height=6}
+selected$AISelect <- factor(
+  ifelse(is.na(selected$AISelect), "NA", as.character(selected$AISelect)),
+  levels = c('Yes', 'No, but I plan to soon', 'No, and I don\'t plan to', 'NA'),
+  ordered = TRUE
+)
+Age_order <- c("Under 18 years old", "18-24 years old", "25-34 years old", "35-44 years old", "45-54 years old", "55-64 years old", "65 years or older", "Prefer not to say")
+selected$Age <- factor(selected$Age, levels = Age_order, ordered = TRUE)
+
+ggplot(selected, aes(x = Age, y = AISelect)) +
+  geom_jitter(aes(color = AISelect), width = 0.1, height = 0.1, alpha = 0.01) +
+  theme_minimal() +
+  labs(y = "AISelect") +
+  theme(legend.position = "none") -> p1
+
+counts <- selected %>%
+  group_by(Age, AISelect) %>%
+  summarize(Count = n(), .groups = "drop")
+
+ggplot(counts, aes(x = Age, y = Count, color = AISelect, group = AISelect)) +
+  geom_smooth(method = "loess", se = FALSE) +
+  theme_minimal() +
+  labs(
+    title = "AI usage across Ages",
+    x = "Age",
+    y = "Count of Responses"
+  ) +
+  theme(
+    legend.position = "top",          # Remove legend
+    axis.title.x = element_blank(),   # Remove x-axis title
+  )  -> p2
+
+p2 / p1
+```
+As we expected, we see that AI adoption into workflows amongst developers is most prevelant amongst young professionals. There is a right skew indicating that older people have adopted AI less. However, there is also a fair number of respondents that don't and do not plan to use AI. It was the second most popular view amongst 25-34 year olds, which indicates a near-polarization when it comes to comfort with AI. As a secondary distinction, we check how these views vary by country. 
+
+### Country Plot if time to fix.
+
+```{r}
+# Load necessary libraries
+library(sf)
+library(rnaturalearth)
+library(rnaturalearthdata)
+
+
+aiselectcountry <- read.csv('data/AISelect_CountryCode.csv')
+
+ai_select_data <- aiselectcountry %>%
+  filter(!is.na(AISelect)) %>%  # Remove rows with missing data
+  group_by(Country_Code) %>%  # Group by country
+  summarise(
+    ThreatCount = sum(AISelect == "Yes", na.rm = TRUE),  # Count how many think AI is a threat
+    TotalCount = n(),  # Count the total number of responses
+    ProportionThreat = ThreatCount / TotalCount * 100  # Calculate the proportion
+  )
+
+world <- ne_countries(scale = "medium", returnclass = "sf")
+world_data <- left_join(world, ai_select_data, by = c("iso_a3" = "Country_Code"))
+
+ggplot(data = world_data) +
+  geom_sf(aes(fill = ProportionThreat)) +
+  scale_fill_viridis_c(name = "Proportion of AI Usage") +
+  theme_minimal() +
+  labs(title = "Proportion of Threat by Country Code") +
+  theme(legend.position = "bottom")
+```
+
 
 ----
 
 
 ```{r}
-library(ggplot2)
-library(ggalluvial)
-library(dplyr)
-library(plotly)
-
 AIThreat_order <- c('No', 'Unsure', 'Yes')
 selected$AIThreat <- factor(selected$AIThreat, levels = AIThreat_order, ordered = TRUE)
 
