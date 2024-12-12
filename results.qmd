@@ -144,6 +144,15 @@ ggplot(avg_years_code_pro, aes(x = avg_years_code_pro, y = reorder(DevType, avg_
         axis.title = element_text(size = 12))  # Adjust axis title size
 
 ```
+This graph represents and confirms what is already suspected, those with most years of professional coding experience are at higher positions like C-Suite, Managers, Product Managers whereas those with lower years of coding experience tend to be Students, Data Analysts, Designers etc.
+Higher Experience Roles: C-Suite Executives oversee company-wide, strategy, budgeting, and long-term planning, responsibilities often gained after years of technical and managerial experience.
+Product Managers need domain knowledge and business acumen, skills that are developed through years of cross-functional experience.
+
+Lower Experience Roles: These roles often serve as entry-level positions or focus on specific aspects of tech projects without requiring extensive coding experience.
+Students are just beginning their journey and likely still developing coding expertise through education and internships.
+Data Analysts often rely more on tools like Excel, SQL, and Tableau rather than programming-heavy workflows, making these roles accessible to those with foundational coding knowledge.
+Designers focus on user interfaces and experiences, requiring creativity and knowledge of design tools more than coding proficiency.
+
 
 ```{r}
 #| fig-width: 12
@@ -218,6 +227,9 @@ ggplot(selected, aes(x = DevType, fill = RemoteWork)) +
 
 ```
 
+Roles such as Data Scientist or Machine Learning Specialist, Cloud Infrastructure Engineer, and Developer - Backend have significant proportions of employees working fully remote, indicating these roles are well-suited for remote work environments.
+Hybrid work is the most common mode for many roles, such as Product Manager, Full-stack Developer, and Site Reliability Engineer, indicating a balanced approach where both remote and in-person presence are valued.
+In-person work is seen more in roles like Hardware Engineer, Engineering Manager, and System Administrator, which may require physical presence due to the nature of their responsibilities, such as managing physical systems or hardware.
 ```{r}
 ggplot(selected, aes(x = as.factor(AISelect), y = as.numeric(JobSat))) +
   geom_jitter(aes(), alpha = 0.1, width = 0.2) +  # Add jitter for better visibility
@@ -227,6 +239,13 @@ ggplot(selected, aes(x = as.factor(AISelect), y = as.numeric(JobSat))) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 ```
+Individuals who selected Yes for AI tool usage generally show high job satisfaction across all visit frequencies.
+Those planning to use AI tools soon seem to have slightly lower job satisfaction compared to current users but higher satisfaction than those not using AI tools.
+Job satisfaction appears distributed similarly across different Stack Overflow visit frequencies.
+Frequent visitors exhibit a larger spread of job satisfaction, potentially indicating diverse user experiences.
+Denser areas in each plot indicate where most responses are concentrated. 
+"Yes" under AI Tool Selection has a higher density at the top of the y-axis, suggesting a positive association between AI tool usage and job satisfaction.
+This analysis suggests that using AI tools is associated with higher job satisfaction, regardless of Stack Overflow visit frequency.
 
 
 ```{r}
@@ -239,6 +258,11 @@ ggplot(selected, aes(x = SOPartFreq, fill = RemoteWork)) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 ```
+The Hybrid (some remote, some in-person) setup is the most frequent across all participation categories. 
+In-person workers generally participate less frequently, with lower counts in all categories except for "Less than once per month or monthly."
+The Remote group has a significant number of participants, particularly in the "Multiple times per day" and "Daily or almost daily" categories, but still lower than the Hybrid group.
+"A few times per week" and "Less than once per month or monthly" show low levels of participation, especially in the In-person group, indicating less frequent participation in Stack Overflow for those working primarily in-person.
+The "I have never participated in Q&A on Stack Overflow" category shows a notable number of In-person workers, suggesting lower engagement from those not working remotely.
 
 ```{r}
 selected_vf_pf <- selected %>%
@@ -255,6 +279,12 @@ ggplot(selected_vf_pf, aes(x = SOVisitFreq, fill = SOPartFreq)) +
 
 
 ```
+For those visiting "Once per month or monthly," a significant portion has never participated, or participates less than once per month. This suggests that infrequent visitors are less likely to engage actively.
+As visit frequency increases to "A few times per month or weekly," there is a noticeable increase in participation, particularly in the "A few times per week" category. This indicates that more frequent visits are associated with higher engagement.
+For those visiting "Daily or almost daily," participation is more evenly distributed across different frequencies, with a notable increase in daily participation.
+The category "Multiple times per day" shows a high level of active participation, with many users participating multiple times daily.
+The proportion of users who have never participated decreases as visit frequency increases.
+Users visiting more frequently tend to participate more actively. This is evident from the increasing proportions in categories like "Daily or almost daily" and "Multiple times per day" as visit frequency increases.
 
 ```{r}
 library(ggplot2)
@@ -380,6 +410,11 @@ ggplot(selected, aes(x = EdLevel)) +
 
 
 ```
+From this graph it can be seen that the most common highest qualification for people is a Bachelor’s degree, followed by a Master’s degree.
+Over 40,000 individuals have achieved higher education degrees (Bachelor’s, Master’s, and Professional degrees). This suggests a strong focus on advanced education within the community.
+ Approximately 16,000+ individuals fall into categories such as pre-primary, secondary, some college without a degree, associate degrees, and "something else." This indicates that fewer people stop their formal education at these levels.
+The substantial number of Master's and Professional degrees signifies a trend toward pursuing advanced education.
+
 ```{r}
 # Install and load treemap package
 library(treemap)
@@ -403,6 +438,14 @@ treemap(industry_counts_df,
 )
 
 ```
+Software Development is the largest sector, occupying a significant portion of the distribution. This could reflect the high engagement of software developers in surveys like these.
+Fintech and Internet, Telecomm or Information Services are also prominent, reflecting the growing importance of digital financial services and communication technologies.
+Healthcare and Retail and Consumer Services are moderately sized.
+Sectors like Banking/Financial Services, Manufacturing, and Government have smaller representations, suggesting either niche markets or less emphasis compared to larger sectors.
+Media & Advertising Services, Higher Education, and Transportation, or Supply Chain are similarly sized.
+The inclusion of non-tech industries like Healthcare, Government, and Retail shows that technology professionals are present across diverse fields. The dominance of tech industries highlights the survey's appeal to respondents working in these domains.
+
+
 ```{r fig.height=10}
 ggplot(selected, aes(x = Age)) +
   geom_bar(fill='lightblue') +
@@ -414,4 +457,10 @@ ggplot(selected, aes(x = Age)) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 ```
+The majority of respondents are professional developers, particularly in the 18-24 and 25-34 age groups. This indicates a strong presence of young professionals in the tech industry.
+Those who code primarily as a hobby or are learning to code are significantly fewer compared to professional developers. However, they are present across all age groups, with a slight concentration in younger demographics.
+Individuals who used to be developers but no longer are form a very small portion of the sample, suggesting that career transitions out of development might be less common or that they move into roles still related to technology.
+People who code as part of their work or studies but not as their primary role are spread across various age groups, with notable numbers in the 25-34 and 35-44 age ranges. This reflects the interdisciplinary nature of coding skills in various professions.
+The 18-24 and 25-34 age groups dominate across most categories, highlighting these as key ages for both entering and establishing a career in coding.
+
 
