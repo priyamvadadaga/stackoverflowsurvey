@@ -96,7 +96,6 @@ ggplot(distribution, aes(x = reorder(Industry, -Percent), y = Percent, fill = AI
 ```
 ```{r}
 # | fig-width: 15
-# | fig-width: 10
 
 SOVisitFreq_order <- c('Less than once per month or monthly', 'A few times per month or weekly', 'A few times per week', 'Daily or almost daily', 'Multiple times per day')
 selected$SOVisitFreq <- factor(selected$SOVisitFreq, levels = SOVisitFreq_order, ordered = TRUE)
@@ -108,7 +107,6 @@ selected$SOPartFreq <- factor(selected$SOPartFreq, levels = SOPartFreq_order, or
 filtered <- selected |> 
   filter(!is.na(SOVisitFreq) & !is.na(SOPartFreq))
 
-filtered
 ggplot(filtered, aes(x = SOVisitFreq, y = SOPartFreq)) +
   geom_jitter(alpha=0.04) +
   labs(
@@ -463,4 +461,17 @@ Individuals who used to be developers but no longer are form a very small portio
 People who code as part of their work or studies but not as their primary role are spread across various age groups, with notable numbers in the 25-34 and 35-44 age ranges. This reflects the interdisciplinary nature of coding skills in various professions.
 The 18-24 and 25-34 age groups dominate across most categories, highlighting these as key ages for both entering and establishing a career in coding.
 
+
+```{r}
+industry_summary <- selected |>
+  dplyr::group_by(Industry) |>
+  dplyr::summarize(Count = dplyr::n(), .groups = "drop")
+
+# Preview the dataset
+print(industry_summary)
+
+# Export to a CSV file
+write.csv(industry_summary, "data/industry_summary.csv", row.names = FALSE)
+
+```
 
