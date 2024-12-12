@@ -255,6 +255,7 @@ ggplot(selected_vf_pf, aes(x = SOVisitFreq, fill = SOPartFreq)) +
 
 
 ```
+
 ```{r}
 library(ggplot2)
 library(dplyr)
@@ -394,8 +395,6 @@ treemap(industry_counts_df,
         palette = "Blues", # Customize the color palette
         draw = TRUE,
         title = "Distribution of Industries of Respondents",
-
-
         fontsize.title = 16,  # Adjust title font size
         fontsize.labels = 12, # Adjust labels font size
         fontsize.legend = 10, # Adjust legend font size
