@@ -255,39 +255,6 @@ ggplot(selected_vf_pf, aes(x = SOVisitFreq, fill = SOPartFreq)) +
 
 
 ```
-
-```{r}
-# Load necessary libraries
-library(ggplot2)
-library(dplyr)
-library(tidyr)
-library(viridis)
-library(maps)
-
-# Load map data
-map_data <- map_data("world")
-
-# Summarize Job Satisfaction data by country
-job_sat_data <- selected %>%
-  filter(!is.na(JobSat_Grouped)) %>% # Remove missing values
-  group_by(Country, JobSat_Grouped) %>%
-  tally() %>%
-  spread(JobSat_Grouped, n, fill = 0) %>%
-  mutate(
-    Total = High + Medium + Low,
-    High_Proportion = High / Total * 100 # Proportion of "High" satisfaction
-  )
-
-# Merge map data with summarized job satisfaction data
-merged_data <- left_join(map_data, job_sat_data, by = c("region" = "Country"))
-
-# Plot the choropleth map
-ggplot(merged_data, aes(x = long, y = lat, group = group, fill = High_Proportion)) +
-  geom_polygon(color = "black", size = 0.1) +
-  scale_fill_viridis(option = "magma", direction = -1, name = "High Job Sat (%)") +
-  theme_void() +
-  labs(title = "Job Satisfaction (High) Proportion by Country")
-```
 ```{r}
 library(ggplot2)
 library(dplyr)
@@ -435,6 +402,17 @@ treemap(industry_counts_df,
         legend = TRUE,  # Show legend
         border.col = "white" # White border around the tiles for better visibility
 )
+
+```
+```{r fig.height=10}
+ggplot(selected, aes(x = Age)) +
+  geom_bar(fill='lightblue') +
+  facet_wrap(~ MainBranch) +
+  theme_minimal() +
+  labs(title = "Distribution of Age by Main Branch",
+       x = "Age",
+       y = "Count")+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 ```
 
