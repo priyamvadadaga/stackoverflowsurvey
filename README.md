@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-This project analyzes data from the Stack Overflow Developer Survey using R and Quarto to generate insights into developer trends. Through the exploration and visualizations, we explore relationships between key variables such as demographics (industries of respondents, education level), participation on Stack Overflow, and insights on future AI usage/trends.
+This project analyzes data from the Stack Overflow Developer Survey using R to generate insights into developer trends. Through the exploration and visualizations, we explore relationships between key variables such as demographics (industries of respondents, education level), participation on Stack Overflow, and insights on future AI usage/trends.
 
 ### Key Features
 - **Data Preparation**: Cleaning, transforming, and summarizing survey data using R.
