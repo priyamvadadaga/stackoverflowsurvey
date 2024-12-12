@@ -95,7 +95,6 @@ ggplot(distribution, aes(x = reorder(Industry, -Percent), y = Percent, fill = AI
   )
 ```
 ```{r}
-# | fig-width: 15
 # | fig-width: 10
 
 SOVisitFreq_order <- c('Less than once per month or monthly', 'A few times per month or weekly', 'A few times per week', 'Daily or almost daily', 'Multiple times per day')
@@ -108,7 +107,6 @@ selected$SOPartFreq <- factor(selected$SOPartFreq, levels = SOPartFreq_order, or
 filtered <- selected |> 
   filter(!is.na(SOVisitFreq) & !is.na(SOPartFreq))
 
-filtered
 ggplot(filtered, aes(x = SOVisitFreq, y = SOPartFreq)) +
   geom_jitter(alpha=0.04) +
   labs(
@@ -256,7 +254,7 @@ ggplot(selected_vf_pf, aes(x = SOVisitFreq, fill = SOPartFreq)) +
 
 ```
 
-```{r}
+
 # Load necessary libraries
 library(ggplot2)
 library(dplyr)
@@ -287,7 +285,7 @@ ggplot(merged_data, aes(x = long, y = lat, group = group, fill = High_Proportion
   scale_fill_viridis(option = "magma", direction = -1, name = "High Job Sat (%)") +
   theme_void() +
   labs(title = "Job Satisfaction (High) Proportion by Country")
-```
+
 ```{r}
 library(ggplot2)
 library(dplyr)
@@ -413,13 +411,10 @@ ggplot(selected, aes(x = EdLevel)) +
 
 ```
 ```{r}
-# Install and load treemap package
 library(treemap)
 
-# Create a treemap for education levels
 industry_counts_df <- as.data.frame(table(selected$Industry))
 
-# Create the treemap with labels and legend
 treemap(industry_counts_df,
         index = "Var1",  # Category variable
         vSize = "Freq",  # Size based on frequency
@@ -437,4 +432,11 @@ treemap(industry_counts_df,
 )
 
 ```
+```{r}
+languages <- read.csv('data/languages.csv')
+ggplot(languages, aes(x = reorder(index, -Language), y=Language)) +
+  geom_col(fill='lightblue') +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+```
+
 
