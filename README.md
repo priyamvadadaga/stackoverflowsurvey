@@ -2,11 +2,11 @@
 
 ## Project Overview
 
-This project analyzes data from the Stack Overflow Developer Survey using R and Quarto to generate insights into developer trends. The analysis includes various interactive and static visualizations created with R libraries and the D3.js JavaScript library. These visualizations explore relationships between key variables such as demographics (industries of respondents, education level), participation on Stack Overflow, insights on future AI usage/trends and more.
+This project analyzes data from the Stack Overflow Developer Survey using R and Quarto to generate insights into developer trends. Through the exploration and visualizations, we explore relationships between key variables such as demographics (industries of respondents, education level), participation on Stack Overflow, and insights on future AI usage/trends.
 
 ### Key Features
 - **Data Preparation**: Cleaning, transforming, and summarizing survey data using R.
-- **Static Visualizations**: Comprehensive static plots generated with `ggplot2` and other R visualization tools.
+- **Static Visualizations**: Comprehensive static plots generated with `ggplot2` and other R libraries.
 - **Interactive D3 Visualization**: A dynamic D3.js-based bar chart embedded in a Quarto document, showcasing industry-wise respondent distribution.
 - **Reproducible Workflow**: Quarto `.qmd` files for report generation and `.js` scripts for interactive visualizations.
 
@@ -57,12 +57,12 @@ The dataset consists of various variables that capture key information about res
 - **SurveyLength**: Length of the survey taken by the respondent.
 - **SurveyEase**: Ease of filling out the survey, based on the respondent's feedback.
 
-### Data Type
+### Data Types
 
 - **Categorical Variables**: MainBranch, EdLevel, DevType, Country, SOVisitFreq, SOAccount, SOPartFreq, SOComm, AISelect, AISent, AIAcc, AIComplex, AIThreat, ICorPM, ProfessionalCloud, ProfessionalQuestion, Industry, JobSat, SurveyLength, SurveyEase.
 - **Numerical Variables**: Age, YearsCode, YearsCodePro, ConvertedCompYearly, TimeSearching, TimeAnswering, Knowledge_1 through Knowledge_9.
 
-We also separately parsed other variables with multiple responses using Python.
+We also separately parsed other variables with multiple responses using Python using `preprocess.ipynb`.
 ### Usage
 
 This dataset allows you to perform various analyses, including:
@@ -80,5 +80,3 @@ This dataset is based on the **Stack Overflow Developer Survey**, which is publi
 ### File Formats
 
 The data is available in CSV format (`survey.csv`) and is processed using R for analysis and visualization.
-
-
