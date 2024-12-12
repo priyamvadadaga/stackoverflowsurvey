@@ -28,13 +28,13 @@ keep <- c('MainBranch', 'Age', 'RemoteWork', 'Check', 'EdLevel', 'YearsCode', 'Y
 selected <- survey |> dplyr::select(all_of(keep))
 selected <- selected |>
   mutate(across(c('MainBranch', 'Age', 'RemoteWork', 'Check', 'EdLevel', 'DevType', 'SOVisitFreq', 'SOAccount', 'SOPartFreq', 'SOComm', 'AISelect', 'AISent', 'AIAcc', 'AIComplex', 'AIThreat', 'ICorPM', 'Knowledge_1', 'Knowledge_2', 'Knowledge_3', 'Knowledge_4', 'Knowledge_5', 'Knowledge_6', 'Knowledge_7', 'Knowledge_8', 'Knowledge_9', 'TimeSearching', 'TimeAnswering', 'ProfessionalCloud', 'ProfessionalQuestion', 'JobSat', 'SurveyLength', 'SurveyEase'), as.factor))
+
 write_json(selected, "data/selected.json")
 ```
 
-
-### Eduction
+### Education
 The survey data covers Stack Overflow users across varying education levels. The distribution of highest level of education obtained is plotted below.
-```{r fig.height=10}
+```{r fig.height=7, warning=FALSE}
 selected$EdLevel <- factor(selected$EdLevel, 
                            levels = c("Primary/elementary school", 
                                       "Secondary school (e.g. American high school, German Realschule or Gymnasium, etc.)",
@@ -46,7 +46,7 @@ selected$EdLevel <- factor(selected$EdLevel,
                                       "Something else"))
 
 ggplot(selected, aes(x = EdLevel)) +
-  geom_bar(fill = "skyblue", color = "black", size=0.1) +
+  geom_bar(fill = "skyblue", color = "black", linewidth=0.1) +
   labs(
     title = "Distribution of Highest Level of Formal Education",
     x = "Education Level",
@@ -81,12 +81,14 @@ Sectors like Government and Media & Advertising Services have smaller representa
 languages <- read.csv('data/languages.csv')
 ggplot(languages, aes(x = reorder(index, -Language), y=Language)) +
   geom_col(fill='lightblue') +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))+
+  labs(x = "Language", y = "Count",title = "Most common languages used")
 ```
-TODO: add description
+The plot shows that mostly Javascript and HTML are the languages most used by respondents of the survey, indicating that majority of the respondents are in the web development field. This is then followed by other common softwares like Python, SQL, Typescript, Java, C++ and more. There is a noticeable drop in usage after the top three languages. Many languages on the right tail have significantly lower counts, indicating specialized applications.
+
 
 ### Age v/s Coding Practice
-```{r fig.height=8}
+```{r fig.height=7}
 ggplot(selected, aes(x = Age)) +
   geom_bar(fill='lightblue') +
   facet_wrap(~ MainBranch) +
@@ -145,7 +147,16 @@ StackOverflow is driven primarily through user contributions. It has been the go
 
 ### Visits versus Participation
 
-```{r}
+```{r, warning=FALSE}
+AIThreat_order <- c('No', 'Unsure', 'Yes')
+selected$AIThreat <- factor(selected$AIThreat, levels = AIThreat_order, ordered = TRUE)
+
+AISent_order <- c('Very unfavorable', 'Unfavorable', 'Unsure', 'Indifferent', 'Favorable', 'Very favorable')
+selected$AISent <- factor(selected$AISent, levels = AISent_order, ordered = TRUE)
+
+AIComplex_order <- c('Very poor at handling complex tasks', 'Bad at handling complex tasks', 'Neither good or bad at handling complex tasks', 'Good, but not great at handling complex tasks', 'Very well at handling complex tasks')
+selected$AIComplex <- factor(selected$AIComplex, levels = AIComplex_order, ordered = TRUE)
+
 SOVisitFreq_order <- c('Less than once per month or monthly', 'A few times per month or weekly', 'A few times per week', 'Daily or almost daily', 'Multiple times per day')
 selected$SOVisitFreq <- factor(selected$SOVisitFreq, levels = SOVisitFreq_order, ordered = TRUE)
 
@@ -310,7 +321,7 @@ Lighter regions across the map highlight higher AI usage, include parts of Asia,
 
 ### Alluvial Diagram
 
-```{r}
+```{r, warning=FALSE, message=FALSE}
 AIThreat_order <- c('No', 'Unsure', 'Yes')
 selected$AIThreat <- factor(selected$AIThreat, levels = AIThreat_order, ordered = TRUE)
 
@@ -334,7 +345,7 @@ alluvial_data <- filtered_data |>
 
 ```
 
-```{r}
+```{r, warning=FALSE}
 #| fig-width: 10
 #| fig-height: 6
 ggplot(alluvial_data,
@@ -350,9 +361,9 @@ ggplot(alluvial_data,
   labs(title = "Alluvial Diagram for Developers",
        x = NULL,
        y = "Frequency") +
-  theme(legend.position = 'bottom', plot.title = element_text(size = 12)) -> p
+  theme(legend.position = 'bottom', plot.title = element_text(size = 17)) -> p
 
 p
 ```
 
-TODO: add description
+Across the four parameters that measure users' perspectives on AI, we observe that although typically polarized views are "sticky", in the sense that those hold strong positive views or strong negative views hold these across their beliefs in accuracy, their sentiment, 
