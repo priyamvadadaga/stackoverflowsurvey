@@ -1,4 +1,4 @@
-### StackOverflow 2024 Survey Analysis
+# StackOverflow 2024 Survey Analysis
 
 ## Project Overview
 
